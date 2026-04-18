@@ -17,7 +17,7 @@ OUTER_FENCE_REGEX = re.compile(
 )
 
 # Filenames and paths that almost certainly hold secrets or PII. Compressing
-# them ships raw bytes to the Anthropic API — a third-party data boundary that
+# sends content through Cursor's agent — a third-party boundary that
 # developers on sensitive codebases cannot cross. detect.py already skips .env
 # by extension, but credentials.md / secrets.txt / ~/.aws/credentials would
 # slip through the natural-language filter. This is a hard refuse before read.
@@ -44,7 +44,7 @@ SENSITIVE_NAME_TOKENS = (
 
 
 def is_sensitive_path(filepath: Path) -> bool:
-    """Heuristic denylist for files that must never be shipped to a third-party API."""
+    """Heuristic denylist for files that must never be sent through Cursor's agent."""
     name = filepath.name
     if SENSITIVE_BASENAME_REGEX.match(name):
         return True
@@ -69,28 +69,17 @@ from .validate import validate
 MAX_RETRIES = 2
 
 
-# ---------- LLM Calls ----------
+# ---------- Cursor agent (only path; no vendor HTTP APIs) ----------
 
 
 def call_llm(prompt: str) -> str:
-    api_key = os.environ.get("ANTHROPIC_API_KEY")
-    if api_key:
-        try:
-            import anthropic
-
-            client = anthropic.Anthropic(api_key=api_key)
-            msg = client.messages.create(
-                model=os.environ.get("NEANDERCODE_MODEL", "gpt-5"),
-                max_tokens=8192,
-                messages=[{"role": "user", "content": prompt}],
-            )
-            return strip_llm_wrapper(msg.content[0].text.strip())
-        except ImportError:
-            pass  # anthropic not installed, fall back to CLI
-    # Fallback: use cursor agent CLI (handles Cursor auth)
+    cmd = ["cursor", "agent", "-p", "--output-format", "text", "--trust"]
+    if model := os.environ.get("NEANDERCODE_MODEL"):
+        cmd += ["--model", model]
+    cmd.append(prompt)
     try:
         result = subprocess.run(
-            ["cursor", "agent", "-p", "--output-format", "text", "--trust", prompt],
+            cmd,
             text=True,
             capture_output=True,
             check=True,
@@ -106,9 +95,8 @@ def call_llm(prompt: str) -> str:
         hint = ""
         if "Cannot find module" in err or "file-service" in err:
             hint = (
-                "\n\nFix: Cursor Agent native module missing or wrong arch — run `cursor agent update`, "
-                "or reinstall Cursor from https://cursor.com .\n"
-                "Bypass: set ANTHROPIC_API_KEY and `pip install anthropic` so compress uses the API instead of CLI."
+                "\n\nFix: Cursor Agent failed to load a native module — run `cursor agent update`, "
+                "or reinstall Cursor from https://cursor.com ."
             )
         raise RuntimeError(f"Cursor agent call failed:\n{e.stderr or err}{hint}") from e
 
@@ -173,15 +161,15 @@ def compress_file(filepath: Path) -> bool:
     if filepath.stat().st_size > MAX_FILE_SIZE:
         raise ValueError(f"File too large to compress safely (max 500KB): {filepath}")
 
-    # Refuse files that look like they contain secrets or PII. Compressing ships
-    # the raw bytes to the Anthropic API — a third-party boundary — so we fail
+    # Refuse files that look like they contain secrets or PII. Compressing sends
+    # content through Cursor's agent — a third-party boundary — so we fail
     # loudly rather than silently exfiltrate credentials or keys. Override is
     # intentional: the user must rename the file if the heuristic is wrong.
     if is_sensitive_path(filepath):
         raise ValueError(
             f"Refusing to compress {filepath}: filename looks sensitive "
             "(credentials, keys, secrets, or known private paths). "
-            "Compression sends file contents to the Anthropic API. "
+            "Compression sends file contents through Cursor's agent. "
             "Rename the file if this is a false positive."
         )
 

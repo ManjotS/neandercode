@@ -127,9 +127,9 @@ Snapshots committed to git. CI reads without API calls. Only regenerate when SKI
 
 ## Benchmarks
 
-`benchmarks/` runs real prompts through LLM API (not Cursor agent CLI), records raw token counts. Results committed as JSON in `benchmarks/results/`. Benchmark table in README generated from results — update when regenerating.
+`benchmarks/` runs prompts through **`cursor agent -p`**, then scores output length with **tiktoken** (`o200k_base`) — same approximation idea as `evals/`. Results committed as JSON in `benchmarks/results/`. Benchmark table in README generated from results — update when regenerating.
 
-To reproduce: `uv run python benchmarks/run.py` (needs `ANTHROPIC_API_KEY` in `.env.local`).
+To reproduce: install deps (`pip install -r benchmarks/requirements.txt` or `uv pip install -r benchmarks/requirements.txt`), ensure `cursor` is on PATH, then `uv run python benchmarks/run.py`. If the agent fails to start, run **`cursor agent update`**.
 
 ---
 

@@ -1,17 +1,20 @@
 #!/usr/bin/env python3
-"""Benchmark neandercode vs normal Agent output token counts."""
+"""Benchmark neandercode vs normal Agent output token counts via `cursor agent`.
+
+Output token counts are tiktoken `o200k_base` on the returned text (approximate),
+same spirit as evals — not provider-reported usage.
+"""
 
 import argparse
 import hashlib
 import json
 import os
 import statistics
+import subprocess
 import sys
 import time
 from datetime import datetime, timezone
 from pathlib import Path
-
-import anthropic
 
 # Load .env.local from repo root if it exists
 _env_file = Path(__file__).parent.parent / ".env.local"
@@ -49,33 +52,53 @@ def sha256_file(path):
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
-def call_api(client, model, system, prompt, max_retries=3):
-    delays = [5, 10, 20]
-    for attempt in range(max_retries + 1):
+_ENC = None
+
+
+def _encoding():
+    """Lazy-load tiktoken so `python benchmarks/run.py --dry-run` works without deps."""
+    global _ENC
+    if _ENC is None:
         try:
-            response = client.messages.create(
-                model=model,
-                max_tokens=4096,
-                temperature=0,
-                system=system,
-                messages=[{"role": "user", "content": prompt}],
-            )
-            return {
-                "input_tokens": response.usage.input_tokens,
-                "output_tokens": response.usage.output_tokens,
-                "text": response.content[0].text,
-                "stop_reason": response.stop_reason,
-            }
-        except anthropic.RateLimitError:
-            if attempt < max_retries:
-                delay = delays[min(attempt, len(delays) - 1)]
-                print(f"  Rate limited, retrying in {delay}s...", file=sys.stderr)
-                time.sleep(delay)
-            else:
-                raise
+            import tiktoken
+        except ModuleNotFoundError as e:
+            raise RuntimeError(
+                "benchmarks need tiktoken. Install: pip install -r benchmarks/requirements.txt"
+            ) from e
+        _ENC = tiktoken.get_encoding("o200k_base")
+    return _ENC
 
 
-def run_benchmarks(client, model, prompts, neandercode_system, trials):
+def _count_tokens(text: str) -> int:
+    return len(_encoding().encode(text))
+
+
+def call_cursor_agent(model: str, system: str, prompt: str) -> dict:
+    """Run `cursor agent -p` with combined system + user prompt; count output tokens locally."""
+    full_prompt = f"{system}\n\nUser prompt:\n{prompt}"
+    cmd = ["cursor", "agent", "-p", "--output-format", "text", "--trust"]
+    if model:
+        cmd += ["--model", model]
+    cmd.append(full_prompt)
+    proc = subprocess.run(cmd, capture_output=True, text=True)
+    if proc.returncode != 0:
+        err = (proc.stderr or "") + (proc.stdout or "")
+        hint = ""
+        if "Cannot find module" in err or "file-service" in err:
+            hint = " Try `cursor agent update` or reinstall Cursor from https://cursor.com"
+        raise RuntimeError(f"cursor agent failed (exit {proc.returncode}):\n{err}{hint}")
+    text = proc.stdout.strip()
+    out_tok = _count_tokens(text)
+    in_tok = _count_tokens(system) + _count_tokens(prompt)
+    return {
+        "input_tokens": in_tok,
+        "output_tokens": out_tok,
+        "text": text,
+        "stop_reason": "end_turn",
+    }
+
+
+def run_benchmarks(model, prompts, neandercode_system, trials):
     results = []
     total = len(prompts)
 
@@ -96,7 +119,7 @@ def run_benchmarks(client, model, prompts, neandercode_system, trials):
                     f"  [{i}/{total}] {pid} | {mode} | trial {t}/{trials}",
                     file=sys.stderr,
                 )
-                result = call_api(client, model, system, prompt_text)
+                result = call_cursor_agent(model, system, prompt_text)
                 entry[mode].append(result)
                 time.sleep(0.5)
 
@@ -178,6 +201,10 @@ def format_table(rows, summary):
     lines.append(
         f"*Range: {summary['min_savings']}%–{summary['max_savings']}% savings across prompts.*"
     )
+    lines.append("")
+    lines.append(
+        "*Token counts: tiktoken `o200k_base` on model output text (approximate). Requires `cursor` CLI.*"
+    )
     return "\n".join(lines)
 
 
@@ -190,6 +217,8 @@ def save_results(results, rows, summary, model, trials, skill_hash):
             "date": datetime.now(timezone.utc).isoformat(),
             "trials": trials,
             "skill_md_sha256": skill_hash,
+            "token_counter": "tiktoken o200k_base on output text",
+            "backend": "cursor agent CLI",
         },
         "summary": summary,
         "rows": rows,
@@ -224,7 +253,7 @@ def dry_run(prompts, model, trials):
     print(f"Model:  {model}")
     print(f"Trials: {trials}")
     print(f"Prompts: {len(prompts)}")
-    print(f"Total API calls: {len(prompts) * 2 * trials}")
+    print(f"Total cursor agent runs: {len(prompts) * 2 * trials}")
     print()
     for p in prompts:
         print(f"  [{p['id']}] ({p['category']})")
@@ -233,13 +262,13 @@ def dry_run(prompts, model, trials):
             preview += "..."
         print(f"    {preview}")
     print()
-    print("Dry run complete. No API calls made.")
+    print("Dry run complete. No cursor agent invocations.")
 
 
 def main():
     parser = argparse.ArgumentParser(description="Benchmark neandercode vs normal Agent")
     parser.add_argument("--trials", type=int, default=3, help="Trials per prompt per mode (default: 3)")
-    parser.add_argument("--dry-run", action="store_true", help="Print config, no API calls")
+    parser.add_argument("--dry-run", action="store_true", help="Print config, no cursor agent calls")
     parser.add_argument("--update-readme", action="store_true", help="Update README.md benchmark table")
     parser.add_argument("--model", default="gpt-5", help="Model to use")
     args = parser.parse_args()
@@ -253,13 +282,11 @@ def main():
     neandercode_system = load_neandercode_system()
     skill_hash = sha256_file(SKILL_PATH)
 
-    client = anthropic.Anthropic()
-
     print(f"Running benchmarks: {len(prompts)} prompts x 2 modes x {args.trials} trials", file=sys.stderr)
     print(f"Model: {args.model}", file=sys.stderr)
     print(file=sys.stderr)
 
-    results = run_benchmarks(client, args.model, prompts, neandercode_system, args.trials)
+    results = run_benchmarks(args.model, prompts, neandercode_system, args.trials)
     rows, summary = compute_stats(results)
     table_md = format_table(rows, summary)
 

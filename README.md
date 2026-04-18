@@ -146,11 +146,11 @@ Repo scripts that call the model (`neandercode-compress`, `evals/llm_run.py`, `b
 
 ### Troubleshooting: `cursor agent` / missing native module
 
-If compress or evals fail with **`Cannot find module '@anysphere/file-service-darwin-x64'`** (or similar), the headless Cursor Agent did not load its optional native bindings — not something this repo can fix inside Python.
+If compress or evals fail with **`Cannot find module '@anysphere/file-service-darwin-…'`**, the package name’s suffix should match your Mac’s CPU: **`arm64`** / **`darwin-arm64`** on **Apple Silicon**, **`x64`** on **Intel**. The headless agent did not load the right optional native binding — not something this repo can fix inside Python.
 
-1. **Refresh the agent**: `cursor agent update` (also run after `npx neandercode` / copying `.cursor` if headless agent misbehaves)
-2. **Reinstall Cursor** from [cursor.com](https://cursor.com) (fixes corrupted/partial installs)
-3. **Match architecture**: On Apple Silicon, use the ARM build of Cursor; avoid mixing x64 Cursor with a mismatched agent cache
+1. **Use the Cursor build that matches your machine** — On **Apple Silicon**, install Cursor’s **Apple Silicon (ARM)** app so **ARM** native modules are used; you do **not** need (and should not rely on) the **Intel/x64** Cursor build on an ARM Mac. On **Intel Macs**, use the **Intel/x64** build. Avoid Rosetta-mismatched installs (e.g. x64 Cursor on ARM) if agent native modules fail to load.
+2. **Refresh the agent**: `cursor agent update` (also run after `npx neandercode` / copying `.cursor` if headless agent misbehaves)
+3. **Reinstall Cursor** from [cursor.com](https://cursor.com) (fixes corrupted/partial installs)
 
 There is **no** separate cloud API key path in this repo — scripts use **`cursor agent`** only.
 

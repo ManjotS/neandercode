@@ -53,7 +53,8 @@ def run_cursor(prompt: str, system: str | None = None) -> str:
         if "Cannot find module" in err or "file-service" in err:
             hint = (
                 "\n\nCursor Agent failed to load a native module. Try: `cursor agent update`, "
-                "or reinstall Cursor from https://cursor.com\n"
+                "or reinstall Cursor from https://cursor.com . "
+                "On Apple Silicon use Cursor’s ARM build (arm64 packages); on Intel Macs use the x64 build.\n"
                 "(See README → Troubleshooting: cursor agent / missing native module.)"
             )
         raise RuntimeError(f"cursor agent exited {proc.returncode}:\n{err}{hint}")

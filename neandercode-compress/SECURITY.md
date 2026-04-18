@@ -19,7 +19,7 @@
 
 ### Auth behavior
 
-Compression uses **`cursor agent`** with the same authentication as your local Cursor install (`cursor agent login` if needed). If `cursor agent` fails (including missing native modules), run **`cursor agent update`** or reinstall Cursor from [cursor.com](https://cursor.com).
+Compression uses **`cursor agent`** with the same authentication as your local Cursor install (`cursor agent login` if needed). If `cursor agent` fails (including missing native modules), use the Cursor installer that matches your CPU (**Apple Silicon** vs **Intel**), then run **`cursor agent update`** or reinstall from [cursor.com](https://cursor.com).
 
 ### File size limit
 

@@ -96,7 +96,9 @@ def call_llm(prompt: str) -> str:
         if "Cannot find module" in err or "file-service" in err:
             hint = (
                 "\n\nFix: Cursor Agent failed to load a native module — run `cursor agent update`, "
-                "or reinstall Cursor from https://cursor.com ."
+                "or reinstall Cursor from https://cursor.com . "
+                "On Apple Silicon, install Cursor’s Apple Silicon (ARM) build so arm64 packages load; "
+                "on Intel Macs, use the Intel/x64 build — match the app to your CPU."
             )
         raise RuntimeError(f"Cursor agent call failed:\n{e.stderr or err}{hint}") from e
 

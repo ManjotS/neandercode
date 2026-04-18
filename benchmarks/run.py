@@ -85,7 +85,10 @@ def call_cursor_agent(model: str, system: str, prompt: str) -> dict:
         err = (proc.stderr or "") + (proc.stdout or "")
         hint = ""
         if "Cannot find module" in err or "file-service" in err:
-            hint = " Try `cursor agent update` or reinstall Cursor from https://cursor.com"
+            hint = (
+                " Try `cursor agent update` or reinstall Cursor from https://cursor.com . "
+                "On Apple Silicon use Cursor’s ARM build; on Intel Macs use the x64 build."
+            )
         raise RuntimeError(f"cursor agent failed (exit {proc.returncode}):\n{err}{hint}")
     text = proc.stdout.strip()
     out_tok = _count_tokens(text)

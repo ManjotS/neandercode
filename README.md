@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://em-content.zobj.net/source/apple/391/rock_1faa8.png" width="120" />
+  <img src="https://github.com/ManjotS/neandercode/blob/main/docs/logo.png?raw=true" height="200" />
 </p>
 
 <h1 align="center">neandercode</h1>
@@ -252,17 +252,6 @@ uv run python evals/llm_run.py
 # Read results (no API key, runs offline)
 uv run --with tiktoken python evals/measure.py
 ```
-
-## Star This Repo
-
-If neandercode save you mass token, mass money — leave mass star. ⭐
-
-[![Star History Chart](https://api.star-history.com/svg?repos=ManjotS/neandercode&type=Date)](https://star-history.com/#ManjotS/neandercode&Date)
-
-## Also by Julius Brussee
-
-- **[Cavekit](https://github.com/JuliusBrussee/cavekit)** — specification-driven development. Neandercode language → specs → parallel builds → working software.
-- **[Revu](https://github.com/JuliusBrussee/revu-swift)** — local-first macOS study app with FSRS spaced repetition, decks, exams, and study guides. [revu.cards](https://revu.cards)
 
 ## License
 

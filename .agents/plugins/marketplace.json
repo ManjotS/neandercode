@@ -1,14 +1,14 @@
 {
-  "name": "caveman-repo",
+  "name": "neandercode-repo",
   "interface": {
-    "displayName": "Caveman Repo"
+    "displayName": "Neandercode Repo"
   },
   "plugins": [
     {
-      "name": "caveman",
+      "name": "neandercode",
       "source": {
         "source": "local",
-        "path": "./plugins/caveman"
+        "path": "./plugins/neandercode"
       },
       "policy": {
         "installation": "AVAILABLE",

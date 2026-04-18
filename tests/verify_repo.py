@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Local verification runner for caveman install surfaces."""
+"""Local verification runner for neandercode install surfaces."""
 
 from __future__ import annotations
 
@@ -62,39 +62,39 @@ def read_json(path: Path) -> object:
 
 def verify_synced_files() -> None:
     section("Synced Files")
-    skill_source = ROOT / "skills/caveman/SKILL.md"
-    rule_source = ROOT / "rules/caveman-activate.md"
+    skill_source = ROOT / "skills/neandercode/SKILL.md"
+    rule_source = ROOT / "rules/neandercode-activate.md"
 
     skill_copies = [
-        ROOT / "caveman/SKILL.md",
-        ROOT / "plugins/caveman/skills/caveman/SKILL.md",
-        ROOT / ".cursor/skills/caveman/SKILL.md",
-        ROOT / ".windsurf/skills/caveman/SKILL.md",
+        ROOT / "neandercode/SKILL.md",
+        ROOT / "plugins/neandercode/skills/neandercode/SKILL.md",
+        ROOT / ".cursor/skills/neandercode/SKILL.md",
+        ROOT / ".windsurf/skills/neandercode/SKILL.md",
     ]
     for copy in skill_copies:
         ensure(copy.read_text() == skill_source.read_text(), f"Skill copy mismatch: {copy}")
 
     rule_copies = [
-        ROOT / ".clinerules/caveman.md",
+        ROOT / ".clinerules/neandercode.md",
         ROOT / ".github/copilot-instructions.md",
     ]
     for copy in rule_copies:
         ensure(copy.read_text() == rule_source.read_text(), f"Rule copy mismatch: {copy}")
 
-    with zipfile.ZipFile(ROOT / "caveman.skill") as archive:
-        ensure("caveman/SKILL.md" in archive.namelist(), "caveman.skill missing caveman/SKILL.md")
+    with zipfile.ZipFile(ROOT / "neandercode.skill") as archive:
+        ensure("neandercode/SKILL.md" in archive.namelist(), "neandercode.skill missing neandercode/SKILL.md")
         ensure(
-            archive.read("caveman/SKILL.md").decode("utf-8") == skill_source.read_text(),
-            "caveman.skill payload mismatch",
+            archive.read("neandercode/SKILL.md").decode("utf-8") == skill_source.read_text(),
+            "neandercode.skill payload mismatch",
         )
 
-    print("Synced copies and caveman.skill zip OK")
+    print("Synced copies and neandercode.skill zip OK")
 
 
 
 
 def load_compress_modules():
-    sys.path.insert(0, str(ROOT / "caveman-compress"))
+    sys.path.insert(0, str(ROOT / "neandercode-compress"))
     import scripts.benchmark  # noqa: F401
     import scripts.cli as cli
     import scripts.compress  # noqa: F401
@@ -108,8 +108,8 @@ def verify_compress_fixtures() -> None:
     section("Compress Fixtures")
     _, detect, validate = load_compress_modules()
 
-    fixtures = sorted((ROOT / "tests/caveman-compress").glob("*.original.md"))
-    ensure(fixtures, "No caveman-compress fixtures found")
+    fixtures = sorted((ROOT / "tests/neandercode-compress").glob("*.original.md"))
+    ensure(fixtures, "No neandercode-compress fixtures found")
 
     for original in fixtures:
         compressed = original.with_name(original.name.replace(".original.md", ".md"))
@@ -118,7 +118,7 @@ def verify_compress_fixtures() -> None:
         ensure(result.is_valid, f"Fixture validation failed for {compressed.name}: {result.errors}")
         ensure(detect.should_compress(compressed), f"Fixture should be compressible: {compressed.name}")
 
-    print(f"Validated {len(fixtures)} caveman-compress fixture pairs")
+    print(f"Validated {len(fixtures)} neandercode-compress fixture pairs")
 
 
 def verify_compress_cli() -> None:
@@ -126,7 +126,7 @@ def verify_compress_cli() -> None:
 
     skip_result = run(
         ["python3", "-m", "scripts", "../hooks/install.sh"],
-        cwd=ROOT / "caveman-compress",
+        cwd=ROOT / "neandercode-compress",
         check=False,
     )
     ensure(skip_result.returncode == 0, "compress CLI skip path should exit 0")
@@ -138,7 +138,7 @@ def verify_compress_cli() -> None:
 
     missing_result = run(
         ["python3", "-m", "scripts", "../does-not-exist.md"],
-        cwd=ROOT / "caveman-compress",
+        cwd=ROOT / "neandercode-compress",
         check=False,
     )
     ensure(missing_result.returncode == 1, "compress CLI missing-file path should exit 1")

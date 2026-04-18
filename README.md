@@ -2,32 +2,32 @@
   <img src="https://em-content.zobj.net/source/apple/391/rock_1faa8.png" width="120" />
 </p>
 
-<h1 align="center">caveman</h1>
+<h1 align="center">neandercode</h1>
 
 <p align="center">
   <strong>why use many token when few do trick</strong>
 </p>
 
 <p align="center">
-  <a href="https://github.com/JuliusBrussee/caveman/stargazers"><img src="https://img.shields.io/github/stars/JuliusBrussee/caveman?style=flat&color=yellow" alt="Stars"></a>
-  <a href="https://github.com/JuliusBrussee/caveman/commits/main"><img src="https://img.shields.io/github/last-commit/JuliusBrussee/caveman?style=flat" alt="Last Commit"></a>
-  <a href="LICENSE"><img src="https://img.shields.io/github/license/JuliusBrussee/caveman?style=flat" alt="License"></a>
+  <a href="https://github.com/ManjotS/neandercode/stargazers"><img src="https://img.shields.io/github/stars/ManjotS/neandercode?style=flat&color=yellow" alt="Stars"></a>
+  <a href="https://github.com/ManjotS/neandercode/commits/main"><img src="https://img.shields.io/github/last-commit/ManjotS/neandercode?style=flat" alt="Last Commit"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/github/license/ManjotS/neandercode?style=flat" alt="License"></a>
 </p>
 
 <p align="center">
   <a href="#before--after">Before/After</a> •
   <a href="#install">Install</a> •
   <a href="#intensity-levels">Levels</a> •
-  <a href="#caveman-skills">Skills</a> •
+  <a href="#neandercode-skills">Skills</a> •
   <a href="#benchmarks">Benchmarks</a> •
   <a href="#evals">Evals</a>
 </p>
 
 ---
 
-A [Cursor](https://cursor.com) rule/skills/commands set that makes the agent talk like caveman — cutting **~75% of output tokens** while keeping full technical accuracy. Now with [文言文 mode](#文言文-wenyan-mode), [terse commits](#caveman-commit), [one-line code reviews](#caveman-review), and a [compression tool](#caveman-compress) that cuts **~46% of input tokens** every session.
+A [Cursor](https://cursor.com) rule/skills/commands set that makes the agent talk like neandercode — cutting **~75% of output tokens** while keeping full technical accuracy. Now with [文言文 mode](#文言文-wenyan-mode), [terse commits](#neandercode-commit), [one-line code reviews](#neandercode-review), and a [compression tool](#neandercode-compress) that cuts **~46% of input tokens** every session.
 
-Based on the viral observation that caveman-speak dramatically reduces LLM token usage without losing technical substance. So we made it a one-line install.
+Based on the viral observation that neandercode-speak dramatically reduces LLM token usage without losing technical substance. So we made it a one-line install.
 
 ## Before / After
 
@@ -42,7 +42,7 @@ Based on the viral observation that caveman-speak dramatically reduces LLM token
 </td>
 <td width="50%">
 
-### 🪨 Caveman Agent (19 tokens)
+### 🪨 Neandercode Agent (19 tokens)
 
 > "New object ref each render. Inline object prop = new ref = re-render. Wrap in `useMemo`."
 
@@ -58,7 +58,7 @@ Based on the viral observation that caveman-speak dramatically reduces LLM token
 </td>
 <td>
 
-### 🪨 Caveman Agent
+### 🪨 Neandercode Agent
 
 > "Bug in auth middleware. Token expiry check use `<` not `<=`. Fix:"
 
@@ -122,13 +122,13 @@ Based on the viral observation that caveman-speak dramatically reduces LLM token
 
 ## Install
 
-Caveman is built natively for Cursor. It uses Cursor's `.cursor/rules`, `.cursor/skills`, and `.cursor/commands` to integrate seamlessly into your workflow.
+Neandercode is built natively for Cursor. It uses Cursor's `.cursor/rules`, `.cursor/skills`, and `.cursor/commands` to integrate seamlessly into your workflow.
 
 **To install in your project:**
 Copy the `.cursor` directory from this repository into the root of your own project.
 
 ```bash
-cp -r path/to/caveman/.cursor /path/to/your/project/
+cp -r path/to/neandercode/.cursor /path/to/your/project/
 ```
 
 Alternatively, you can install the base skill via `npx`:
@@ -144,21 +144,21 @@ npx neandercode
 
 ## Usage
 
-Trigger caveman mode in Cursor Chat using the built-in slash commands:
-- `/caveman` — switch to default caveman mode
-- `/caveman-lite` — drop filler, keep grammar
-- `/caveman-ultra` — maximum compression
-- `/caveman-off` — disable caveman mode
+Trigger neandercode mode in Cursor Chat using the built-in slash commands:
+- `/neandercode` — switch to default neandercode mode
+- `/neandercode-lite` — drop filler, keep grammar
+- `/neandercode-ultra` — maximum compression
+- `/neandercode-off` — disable neandercode mode
 
-Or just say "talk like caveman" or "less tokens please".
+Or just say "talk like neandercode" or "less tokens please".
 
 ### Intensity Levels
 
 | Level | Trigger | What it do |
 |-------|---------|------------|
-| **Lite** | `/caveman lite` | Drop filler, keep grammar. Professional but no fluff |
-| **Full** | `/caveman full` | Default caveman. Drop articles, fragments, full grunt |
-| **Ultra** | `/caveman ultra` | Maximum compression. Telegraphic. Abbreviate everything |
+| **Lite** | `/neandercode lite` | Drop filler, keep grammar. Professional but no fluff |
+| **Full** | `/neandercode full` | Default neandercode. Drop articles, fragments, full grunt |
+| **Ultra** | `/neandercode ultra` | Maximum compression. Telegraphic. Abbreviate everything |
 
 ### 文言文 (Wenyan) Mode
 
@@ -166,34 +166,34 @@ Classical Chinese literary compression — same technical accuracy, but in the m
 
 | Level | Trigger | What it do |
 |-------|---------|------------|
-| **Wenyan-Lite** | `/caveman wenyan-lite` | Semi-classical. Grammar intact, filler gone |
-| **Wenyan-Full** | `/caveman wenyan` | Full 文言文. Maximum classical terseness |
-| **Wenyan-Ultra** | `/caveman wenyan-ultra` | Extreme. Ancient scholar on a budget |
+| **Wenyan-Lite** | `/neandercode wenyan-lite` | Semi-classical. Grammar intact, filler gone |
+| **Wenyan-Full** | `/neandercode wenyan` | Full 文言文. Maximum classical terseness |
+| **Wenyan-Ultra** | `/neandercode wenyan-ultra` | Extreme. Ancient scholar on a budget |
 
 Level stick until you change it or session end.
 
-## Caveman Skills
+## Neandercode Skills
 
-### caveman-commit
+### neandercode-commit
 
-`/caveman-commit` — terse commit messages. Conventional Commits. ≤50 char subject. Why over what.
+`/neandercode-commit` — terse commit messages. Conventional Commits. ≤50 char subject. Why over what.
 
-### caveman-review
+### neandercode-review
 
-`/caveman-review` — one-line PR comments: `L42: 🔴 bug: user null. Add guard.` No throat-clearing.
+`/neandercode-review` — one-line PR comments: `L42: 🔴 bug: user null. Add guard.` No throat-clearing.
 
-### caveman-help
+### neandercode-help
 
-`/caveman-help` — quick-reference card. All modes, skills, commands, one command away.
+`/neandercode-help` — quick-reference card. All modes, skills, commands, one command away.
 
-### caveman-compress
+### neandercode-compress
 
-`/caveman-compress <filepath>` — caveman make Cursor *speak* with fewer tokens. **Compress** make Cursor *read* fewer tokens.
+`/neandercode-compress <filepath>` — neandercode make Cursor *speak* with fewer tokens. **Compress** make Cursor *read* fewer tokens.
 
-Your `CURSOR.md` (or `.cursorrules`) loads on **every session start**. Caveman Compress rewrites memory files into caveman-speak so Cursor reads less — without you losing the human-readable original.
+Your `CURSOR.md` (or `.cursorrules`) loads on **every session start**. Neandercode Compress rewrites memory files into neandercode-speak so Cursor reads less — without you losing the human-readable original.
 
 ```
-/caveman-compress CURSOR.md
+/neandercode-compress CURSOR.md
 ```
 
 ```
@@ -210,14 +210,14 @@ CURSOR.original.md ← human-readable backup (you read and edit this)
 | `mixed-with-code.md` | 888 | 560 | **36.9%** |
 | **Average** | **898** | **481** | **46%** |
 
-Code blocks, URLs, file paths, commands, headings, dates, version numbers — anything technical passes through untouched. Only prose gets compressed. See the full [caveman-compress README](caveman-compress/README.md) for details. [Security note](./caveman-compress/SECURITY.md): Snyk flags this as High Risk due to subprocess/file patterns — it's a false positive.
+Code blocks, URLs, file paths, commands, headings, dates, version numbers — anything technical passes through untouched. Only prose gets compressed. See the full [neandercode-compress README](neandercode-compress/README.md) for details. [Security note](./neandercode-compress/SECURITY.md): Snyk flags this as High Risk due to subprocess/file patterns — it's a false positive.
 
 ## Benchmarks
 
 Real token counts from the LLM API ([reproduce it yourself](benchmarks/)):
 
 <!-- BENCHMARK-TABLE-START -->
-| Task | Normal (tokens) | Caveman (tokens) | Saved |
+| Task | Normal (tokens) | Neandercode (tokens) | Saved |
 |------|---------------:|----------------:|------:|
 | Explain React re-render bug | 1180 | 159 | 87% |
 | Fix auth middleware token expiry | 704 | 121 | 83% |
@@ -235,15 +235,15 @@ Real token counts from the LLM API ([reproduce it yourself](benchmarks/)):
 <!-- BENCHMARK-TABLE-END -->
 
 > [!IMPORTANT]
-> Caveman only affects output tokens — thinking/reasoning tokens are untouched. Caveman no make brain smaller. Caveman make *mouth* smaller. Biggest win is **readability and speed**, cost savings are a bonus.
+> Neandercode only affects output tokens — thinking/reasoning tokens are untouched. Neandercode no make brain smaller. Neandercode make *mouth* smaller. Biggest win is **readability and speed**, cost savings are a bonus.
 
 A March 2026 paper ["Brevity Constraints Reverse Performance Hierarchies in Language Models"](https://arxiv.org/abs/2604.00025) found that constraining large models to brief responses **improved accuracy by 26 percentage points** on certain benchmarks and completely reversed performance hierarchies. Verbose not always better. Sometimes less word = more correct.
 
 ## Evals
 
-Caveman not just claim 75%. Caveman **prove** it.
+Neandercode not just claim 75%. Neandercode **prove** it.
 
-The `evals/` directory has a three-arm eval harness that measures real token compression against a proper control — not just "verbose vs skill" but "terse vs skill". Because comparing caveman to verbose agent conflate the skill with generic terseness. That cheating. Caveman not cheat.
+The `evals/` directory has a three-arm eval harness that measures real token compression against a proper control — not just "verbose vs skill" but "terse vs skill". Because comparing neandercode to verbose agent conflate the skill with generic terseness. That cheating. Neandercode not cheat.
 
 ```bash
 # Run the eval (needs cursor CLI)
@@ -255,15 +255,19 @@ uv run --with tiktoken python evals/measure.py
 
 ## Star This Repo
 
-If caveman save you mass token, mass money — leave mass star. ⭐
+If neandercode save you mass token, mass money — leave mass star. ⭐
 
-[![Star History Chart](https://api.star-history.com/svg?repos=JuliusBrussee/caveman&type=Date)](https://star-history.com/#JuliusBrussee/caveman&Date)
+[![Star History Chart](https://api.star-history.com/svg?repos=ManjotS/neandercode&type=Date)](https://star-history.com/#ManjotS/neandercode&Date)
 
 ## Also by Julius Brussee
 
-- **[Cavekit](https://github.com/JuliusBrussee/cavekit)** — specification-driven development. Caveman language → specs → parallel builds → working software.
+- **[Cavekit](https://github.com/JuliusBrussee/cavekit)** — specification-driven development. Neandercode language → specs → parallel builds → working software.
 - **[Revu](https://github.com/JuliusBrussee/revu-swift)** — local-first macOS study app with FSRS spaced repetition, decks, exams, and study guides. [revu.cards](https://revu.cards)
 
 ## License
 
 MIT — free like mass mammoth on open plain.
+
+## Acknowledgements
+
+This project is a fork of [caveman](https://github.com/JuliusBrussee/caveman) by Julius Brussee. Thank you for the original implementation!

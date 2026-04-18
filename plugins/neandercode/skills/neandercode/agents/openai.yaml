@@ -1,0 +1,6 @@
+interface:
+  display_name: "Neandercode"
+  short_description: "Talk like neandercode. Cut filler. Keep technical accuracy."
+  icon_small: "./assets/neandercode-small.svg"
+  icon_large: "./assets/neandercode.svg"
+  default_prompt: "Use $neandercode to answer briefly, cut filler, and preserve exact technical substance."

@@ -1,7 +1,7 @@
 {
   "name": "neandercode",
   "version": "1.0.0",
-  "description": "Caveman mode for Cursor - why use many token when few do trick",
+  "description": "Neandercode mode for Cursor - why use many token when few do trick",
   "bin": {
     "neandercode": "./install.js"
   },
@@ -18,7 +18,7 @@
   "keywords": [
     "cursor",
     "ai",
-    "caveman",
+    "neandercode",
     "tokens"
   ]
 }

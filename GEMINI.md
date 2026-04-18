@@ -1,4 +1,4 @@
-@./skills/caveman/SKILL.md
-@./skills/caveman-commit/SKILL.md
-@./skills/caveman-review/SKILL.md
-@./caveman-compress/SKILL.md
+@./skills/neandercode/SKILL.md
+@./skills/neandercode-commit/SKILL.md
+@./skills/neandercode-review/SKILL.md
+@./neandercode-compress/SKILL.md

@@ -1,6 +1,6 @@
 # Evals
 
-Measures real token compression of caveman skills by running the same
+Measures real token compression of neandercode skills by running the same
 prompts through Cursor Agent under three conditions and comparing the
 generated output token counts.
 
@@ -49,7 +49,7 @@ This calls Cursor once per prompt × (N skills + 2 control arms). Use
 a small model to keep it cheap:
 
 ```bash
-CAVEMAN_EVAL_MODEL=gpt-5 uv run python evals/llm_run.py
+NEANDERCODE_EVAL_MODEL=gpt-5 uv run python evals/llm_run.py
 ```
 
 ## Read the snapshot (no LLM, no API key, runs in CI)

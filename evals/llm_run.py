@@ -21,7 +21,7 @@ Requires:
 Run: uv run python evals/llm_run.py
 
 Environment:
-  CAVEMAN_EVAL_MODEL  optional --model flag value passed through to cursor
+  NEANDERCODE_EVAL_MODEL  optional --model flag value passed through to cursor
 """
 
 from __future__ import annotations
@@ -42,7 +42,7 @@ TERSE_PREFIX = "Answer concisely."
 
 def run_cursor(prompt: str, system: str | None = None) -> str:
     cmd = ["cursor", "agent", "-p", "--output-format", "text", "--trust"]
-    if model := os.environ.get("CAVEMAN_EVAL_MODEL"):
+    if model := os.environ.get("NEANDERCODE_EVAL_MODEL"):
         cmd += ["--model", model]
     full_prompt = prompt if not system else f"{system}\n\nUser prompt:\n{prompt}"
     cmd.append(full_prompt)
@@ -73,7 +73,7 @@ def main() -> None:
         "metadata": {
             "generated_at": dt.datetime.now(dt.timezone.utc).isoformat(),
             "cursor_agent_version": cursor_agent_version(),
-            "model": os.environ.get("CAVEMAN_EVAL_MODEL", "default"),
+            "model": os.environ.get("NEANDERCODE_EVAL_MODEL", "default"),
             "n_prompts": len(prompts),
             "terse_prefix": TERSE_PREFIX,
         },

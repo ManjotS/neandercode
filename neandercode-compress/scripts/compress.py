@@ -72,6 +72,29 @@ MAX_RETRIES = 2
 # ---------- Cursor agent (only path; no vendor HTTP APIs) ----------
 
 
+def _cursor_agent_error_hint(stderr: str) -> str:
+    """Extra help text for common cursor agent failures (auth, native modules)."""
+    err = stderr or ""
+    low = err.lower()
+    if (
+        "authentication" in low
+        or "cursor agent login" in low
+        or "CURSOR_API_KEY" in err
+    ):
+        return (
+            "\n\nAuthenticate CLI agent: run `cursor agent login` once in a terminal, "
+            "or set the `CURSOR_API_KEY` environment variable for non-interactive use (see Cursor docs)."
+        )
+    if "Cannot find module" in err or "file-service" in err:
+        return (
+            "\n\nFix: Cursor Agent failed to load a native module — run `cursor agent update`, "
+            "or reinstall Cursor from https://cursor.com . "
+            "On Apple Silicon, install Cursor’s Apple Silicon (ARM) build so arm64 packages load; "
+            "on Intel Macs, use the Intel/x64 build — match the app to your CPU."
+        )
+    return ""
+
+
 def call_llm(prompt: str) -> str:
     cmd = ["cursor", "agent", "-p", "--output-format", "text", "--trust"]
     if model := os.environ.get("NEANDERCODE_MODEL"):
@@ -92,15 +115,9 @@ def call_llm(prompt: str) -> str:
         ) from e
     except subprocess.CalledProcessError as e:
         err = (e.stderr or "") + (e.stdout or "")
-        hint = ""
-        if "Cannot find module" in err or "file-service" in err:
-            hint = (
-                "\n\nFix: Cursor Agent failed to load a native module — run `cursor agent update`, "
-                "or reinstall Cursor from https://cursor.com . "
-                "On Apple Silicon, install Cursor’s Apple Silicon (ARM) build so arm64 packages load; "
-                "on Intel Macs, use the Intel/x64 build — match the app to your CPU."
-            )
-        raise RuntimeError(f"Cursor agent call failed:\n{e.stderr or err}{hint}") from e
+        raise RuntimeError(
+            f"Cursor agent call failed:\n{err}{_cursor_agent_error_hint(err)}"
+        ) from e
 
 
 def build_compress_prompt(original: str) -> str:

@@ -49,13 +49,20 @@ def run_cursor(prompt: str, system: str | None = None) -> str:
     proc = subprocess.run(cmd, capture_output=True, text=True)
     if proc.returncode != 0:
         err = (proc.stderr or "") + (proc.stdout or "")
+        low = err.lower()
         hint = ""
-        if "Cannot find module" in err or "file-service" in err:
+        if (
+            "authentication" in low
+            or "cursor agent login" in low
+            or "CURSOR_API_KEY" in err
+        ):
             hint = (
-                "\n\nCursor Agent failed to load a native module. Try: `cursor agent update`, "
-                "or reinstall Cursor from https://cursor.com . "
-                "On Apple Silicon use Cursor’s ARM build (arm64 packages); on Intel Macs use the x64 build.\n"
-                "(See README → Troubleshooting: cursor agent / missing native module.)"
+                "\n\nAuthenticate: run `cursor agent login`, or set `CURSOR_API_KEY` for non-interactive use."
+            )
+        elif "Cannot find module" in err or "file-service" in err:
+            hint = (
+                "\n\nNative module: try `cursor agent update`, reinstall Cursor, or match ARM vs Intel build.\n"
+                "(See README → Troubleshooting: cursor agent.)"
             )
         raise RuntimeError(f"cursor agent exited {proc.returncode}:\n{err}{hint}")
     return proc.stdout.strip()

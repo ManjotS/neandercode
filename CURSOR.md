@@ -117,7 +117,7 @@ For agents without hook systems, minimal always-on snippet lives in README under
 
 Honest delta = **skill vs terse**, not skill vs baseline. Baseline comparison conflates skill with generic terseness — that cheating. Harness designed to prevent this.
 
-`llm_run.py` calls `cursor agent -p ...` per (prompt, arm), saves to `evals/snapshots/results.json`. `measure.py` reads snapshot offline with tiktoken (OpenAI BPE — tokenizer approximation, ratios meaningful, absolute numbers approximate).
+`llm_run.py` calls `cursor agent -p ...` per (prompt, arm), saves to `evals/snapshots/results.json`. Requires **`cursor agent login`** or **`CURSOR_API_KEY`** (CLI auth is separate from the IDE). `measure.py` reads snapshot offline with tiktoken (OpenAI BPE — tokenizer approximation, ratios meaningful, absolute numbers approximate).
 
 Add skill: drop `skills/<name>/SKILL.md`. Harness auto-discovers. Add prompt: append line to `evals/prompts/en.txt`.
 

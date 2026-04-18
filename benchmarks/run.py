@@ -83,11 +83,17 @@ def call_cursor_agent(model: str, system: str, prompt: str) -> dict:
     proc = subprocess.run(cmd, capture_output=True, text=True)
     if proc.returncode != 0:
         err = (proc.stderr or "") + (proc.stdout or "")
+        low = err.lower()
         hint = ""
-        if "Cannot find module" in err or "file-service" in err:
+        if (
+            "authentication" in low
+            or "cursor agent login" in low
+            or "CURSOR_API_KEY" in err
+        ):
+            hint = " Authenticate: `cursor agent login` or set `CURSOR_API_KEY`."
+        elif "Cannot find module" in err or "file-service" in err:
             hint = (
-                " Try `cursor agent update` or reinstall Cursor from https://cursor.com . "
-                "On Apple Silicon use Cursor’s ARM build; on Intel Macs use the x64 build."
+                " Try `cursor agent update` or reinstall Cursor; use ARM Cursor on Apple Silicon, x64 on Intel."
             )
         raise RuntimeError(f"cursor agent failed (exit {proc.returncode}):\n{err}{hint}")
     text = proc.stdout.strip()

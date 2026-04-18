@@ -142,7 +142,14 @@ Or, you can install the full `.cursor` directory directly into your project usin
 npx neandercode
 ```
 
-Repo scripts that call the model (`neandercode-compress`, `evals/llm_run.py`, `benchmarks/run.py`) use **`cursor agent`** only — no bundled vendor API keys. If the agent errors with a missing `@anysphere/...` native module, run **`cursor agent update`** (see below).
+Repo scripts that call the model (`neandercode-compress`, `evals/llm_run.py`, `benchmarks/run.py`) use the **`cursor agent`** CLI (not Anthropic/OpenAI keys from this repo). They need **Cursor authentication** on your machine:
+
+1. **Interactive (usual)**: in a terminal, run once: **`cursor agent login`**
+2. **Scripts / CI / headless**: set **`CURSOR_API_KEY`** in the environment (Cursor documents how to obtain it)
+
+Chat in the IDE uses your logged-in Cursor session; **CLI tools are separate** until you log in the agent or set the key.
+
+If the agent errors with a missing `@anysphere/...` native module, run **`cursor agent update`** (see below).
 
 ### Troubleshooting: `cursor agent` / missing native module
 
@@ -152,7 +159,9 @@ If compress or evals fail with **`Cannot find module '@anysphere/file-service-da
 2. **Refresh the agent**: `cursor agent update` (also run after `npx neandercode` / copying `.cursor` if headless agent misbehaves)
 3. **Reinstall Cursor** from [cursor.com](https://cursor.com) (fixes corrupted/partial installs)
 
-There is **no** separate cloud API key path in this repo — scripts use **`cursor agent`** only.
+### Troubleshooting: `Authentication required` (CLI)
+
+If you see **`Authentication required`** / **`cursor agent login`** when running compress or evals, the headless agent is not logged in. Run **`cursor agent login`** in a terminal, or export **`CURSOR_API_KEY`** for non-interactive runs.
 
 ## Usage
 

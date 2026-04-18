@@ -39,7 +39,9 @@ this harness did and is why its numbers were inflated.
 - `snapshots/results.json` — committed source of truth, regenerated only
   when SKILL.md files or prompts change.
 
-## Refresh the snapshot (requires `cursor` CLI logged in)
+## Refresh the snapshot (requires Cursor agent auth)
+
+Run **`cursor agent login`** once in a terminal (or set **`CURSOR_API_KEY`**). The IDE chat session does not authenticate the CLI automatically.
 
 ```bash
 uv run python evals/llm_run.py

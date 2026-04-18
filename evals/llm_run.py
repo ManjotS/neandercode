@@ -46,8 +46,18 @@ def run_cursor(prompt: str, system: str | None = None) -> str:
         cmd += ["--model", model]
     full_prompt = prompt if not system else f"{system}\n\nUser prompt:\n{prompt}"
     cmd.append(full_prompt)
-    out = subprocess.run(cmd, capture_output=True, text=True, check=True)
-    return out.stdout.strip()
+    proc = subprocess.run(cmd, capture_output=True, text=True)
+    if proc.returncode != 0:
+        err = (proc.stderr or "") + (proc.stdout or "")
+        hint = ""
+        if "Cannot find module" in err or "file-service" in err:
+            hint = (
+                "\n\nCursor Agent failed to load a native module. Try: `cursor agent update`, "
+                "or reinstall Cursor from https://cursor.com\n"
+                "(See README → Troubleshooting: cursor agent / missing native module.)"
+            )
+        raise RuntimeError(f"cursor agent exited {proc.returncode}:\n{err}{hint}")
+    return proc.stdout.strip()
 
 
 def cursor_agent_version() -> str:

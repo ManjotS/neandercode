@@ -96,8 +96,21 @@ def call_llm(prompt: str) -> str:
             check=True,
         )
         return strip_llm_wrapper(result.stdout.strip())
+    except FileNotFoundError as e:
+        raise RuntimeError(
+            "`cursor` CLI not found on PATH. Install Cursor and ensure the shell integration "
+            "adds `cursor` / `cursor agent` to PATH."
+        ) from e
     except subprocess.CalledProcessError as e:
-        raise RuntimeError(f"Cursor agent call failed:\n{e.stderr}")
+        err = (e.stderr or "") + (e.stdout or "")
+        hint = ""
+        if "Cannot find module" in err or "file-service" in err:
+            hint = (
+                "\n\nFix: Cursor Agent native module missing or wrong arch — run `cursor agent update`, "
+                "or reinstall Cursor from https://cursor.com .\n"
+                "Bypass: set ANTHROPIC_API_KEY and `pip install anthropic` so compress uses the API instead of CLI."
+            )
+        raise RuntimeError(f"Cursor agent call failed:\n{e.stderr or err}{hint}") from e
 
 
 def build_compress_prompt(original: str) -> str:

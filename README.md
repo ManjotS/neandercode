@@ -142,6 +142,15 @@ Or, you can install the full `.cursor` directory directly into your project usin
 npx neandercode
 ```
 
+### Troubleshooting: `cursor agent` / missing native module
+
+If compress or evals fail with **`Cannot find module '@anysphere/file-service-darwin-x64'`** (or similar), the headless Cursor Agent did not load its optional native bindings — not something this repo can fix inside Python.
+
+1. **Refresh the agent**: `cursor agent update`
+2. **Reinstall Cursor** from [cursor.com](https://cursor.com) (fixes corrupted/partial installs)
+3. **Match architecture**: On Apple Silicon, use the ARM build of Cursor; avoid mixing x64 Cursor with a mismatched agent cache
+4. **Bypass for scripts**: For `neandercode-compress` / tooling, set **`ANTHROPIC_API_KEY`** and install the **`anthropic`** package so the code uses the API instead of `cursor agent -p`
+
 ## Usage
 
 Trigger neandercode mode in Cursor Chat using the built-in slash commands:

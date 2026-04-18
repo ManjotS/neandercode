@@ -7,9 +7,9 @@ Reports median, min, max and stdev across prompts, not just the mean,
 so the reader can see whether a number is solid or noisy.
 
 Tokenizer note: tiktoken o200k_base is OpenAI's tokenizer and is only an
-approximation of Claude's BPE. The ratios are still meaningful for
+approximation of LLM's BPE. The ratios are still meaningful for
 comparing skills against each other, but the absolute numbers should be
-read as "approximate output-length reduction", not "exact Claude tokens".
+read as "approximate output-length reduction", not "exact LLM tokens".
 
 Run: uv run --with tiktoken python evals/measure.py
 """
@@ -59,9 +59,9 @@ def main() -> None:
 
     print(f"_Generated: {meta.get('generated_at', '?')}_")
     print(
-        f"_Model: {meta.get('model', '?')} · CLI: {meta.get('claude_cli_version', '?')}_"
+        f"_Model: {meta.get('model', '?')} · CLI: {meta.get('cursor_agent_version', '?')}_"
     )
-    print(f"_Tokenizer: tiktoken o200k_base (approximation of Claude's BPE)_")
+    print(f"_Tokenizer: tiktoken o200k_base (approximation of LLM's BPE)_")
     print(
         f"_n = {meta.get('n_prompts', len(baseline_tokens))} prompts, single run per arm_"
     )

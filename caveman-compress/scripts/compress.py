@@ -69,10 +69,10 @@ from .validate import validate
 MAX_RETRIES = 2
 
 
-# ---------- Claude Calls ----------
+# ---------- LLM Calls ----------
 
 
-def call_claude(prompt: str) -> str:
+def call_llm(prompt: str) -> str:
     api_key = os.environ.get("ANTHROPIC_API_KEY")
     if api_key:
         try:
@@ -80,25 +80,24 @@ def call_claude(prompt: str) -> str:
 
             client = anthropic.Anthropic(api_key=api_key)
             msg = client.messages.create(
-                model=os.environ.get("CAVEMAN_MODEL", "claude-sonnet-4-5"),
+                model=os.environ.get("CAVEMAN_MODEL", "gpt-5"),
                 max_tokens=8192,
                 messages=[{"role": "user", "content": prompt}],
             )
             return strip_llm_wrapper(msg.content[0].text.strip())
         except ImportError:
             pass  # anthropic not installed, fall back to CLI
-    # Fallback: use claude CLI (handles desktop auth)
+    # Fallback: use cursor agent CLI (handles Cursor auth)
     try:
         result = subprocess.run(
-            ["claude", "--print"],
-            input=prompt,
+            ["cursor", "agent", "-p", "--output-format", "text", "--trust", prompt],
             text=True,
             capture_output=True,
             check=True,
         )
         return strip_llm_wrapper(result.stdout.strip())
     except subprocess.CalledProcessError as e:
-        raise RuntimeError(f"Claude call failed:\n{e.stderr}")
+        raise RuntimeError(f"Cursor agent call failed:\n{e.stderr}")
 
 
 def build_compress_prompt(original: str) -> str:
@@ -190,8 +189,8 @@ def compress_file(filepath: Path) -> bool:
         return False
 
     # Step 1: Compress
-    print("Compressing with Claude...")
-    compressed = call_claude(build_compress_prompt(original_text))
+    print("Compressing with LLM...")
+    compressed = call_llm(build_compress_prompt(original_text))
 
     # Save original as backup, write compressed to original path
     backup_path.write_text(original_text)
@@ -218,8 +217,8 @@ def compress_file(filepath: Path) -> bool:
             print("❌ Failed after retries — original restored")
             return False
 
-        print("Fixing with Claude...")
-        compressed = call_claude(
+        print("Applying targeted fixes with LLM...")
+        compressed = call_llm(
             build_fix_prompt(original_text, compressed, result.errors)
         )
         filepath.write_text(compressed)

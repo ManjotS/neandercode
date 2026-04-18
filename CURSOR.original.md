@@ -19,7 +19,7 @@ The README is not documentation. It is the product's front door — the thing no
 
 ## Project overview
 
-Caveman makes AI coding agents respond in compressed, caveman-style prose — cutting ~65-75% of output tokens while keeping full technical accuracy. It ships as a Claude Code plugin, a Codex plugin, a Gemini CLI extension, and as agent rule files for Cursor, Windsurf, Cline, Copilot, and 40+ others via `npx skills`.
+Caveman makes AI coding agents respond in compressed, caveman-style prose — cutting ~65-75% of output tokens while keeping full technical accuracy. It ships as a a Codex plugin, a Gemini CLI extension, and as agent rule files for Cursor, Windsurf, Cline, Copilot, and 40+ others via `npx skills`.
 
 ---
 
@@ -67,64 +67,9 @@ The CI bot commits as `github-actions[bot]`. After a PR merges, wait for this wo
 
 ---
 
-## Hook system (Claude Code)
-
-Three hooks ship in `hooks/`. They communicate via a flag file at `~/.claude/.caveman-active`.
-
-```
-SessionStart hook ──writes "full"──▶ ~/.claude/.caveman-active ◀──writes mode── UserPromptSubmit hook
-                                               │
-                                            reads
-                                               ▼
-                                      caveman-statusline.sh
-                                     [CAVEMAN] / [CAVEMAN:ULTRA] / ...
-```
-
-### `hooks/caveman-activate.js` — SessionStart hook
-
-Runs once on every Claude Code session start. Does three things:
-1. Writes `"full"` to `~/.claude/.caveman-active` (creates it if missing)
-2. Emits the caveman ruleset as hidden stdout — Claude Code injects SessionStart hook stdout as system context, invisible to the user
-3. Checks `~/.claude/settings.json` for an existing statusline config; if missing, appends a nudge telling Claude to offer setup on first interaction
-
-Silent-fails on all filesystem errors — never blocks session start.
-
-### `hooks/caveman-mode-tracker.js` — UserPromptSubmit hook
-
-Reads JSON from stdin (Claude Code passes prompt data as JSON on this hook event). Checks if the user prompt starts with `/caveman`. If yes, writes the detected mode to the flag file:
-- `/caveman` → `full`
-- `/caveman lite` → `lite`
-- `/caveman ultra` → `ultra`
-- `/caveman wenyan` or `/caveman wenyan-full` → `wenyan`
-- `/caveman wenyan-lite` → `wenyan-lite`
-- `/caveman wenyan-ultra` → `wenyan-ultra`
-- `/caveman-commit` → `commit`
-- `/caveman-review` → `review`
-- `/caveman-compress` → `compress`
-
-Detects "stop caveman" or "normal mode" in prompt and deletes the flag file.
-
-### `hooks/caveman-statusline.sh` — Statusline badge
-
-Reads the flag file. Outputs a colored badge string for the Claude Code statusline:
-- `full` or empty → `[CAVEMAN]` (orange)
-- anything else → `[CAVEMAN:<MODE_UPPERCASED>]` (orange)
-
-Configured in `~/.claude/settings.json` under `statusLine.command`.
-
-### Hook installation
-
-**Plugin install** — hooks are wired automatically by the plugin system.
-
-**Standalone install** — `hooks/install.sh` (macOS/Linux) or `hooks/install.ps1` (Windows) copies the three hook files into `~/.claude/hooks/` and patches `~/.claude/settings.json` to register SessionStart and UserPromptSubmit hooks plus the statusline.
-
-**Uninstall** — `hooks/uninstall.sh` / `hooks/uninstall.ps1` removes hook files and patches settings.json.
-
----
-
 ## Skill system
 
-Skills are Markdown files with YAML frontmatter consumed by Claude Code's skill/plugin system and by `npx skills` for other agents.
+Skills are Markdown files with YAML frontmatter consumed by `npx skills` for other agents.
 
 ### Intensity levels
 
@@ -150,7 +95,6 @@ How caveman reaches each agent type:
 
 | Agent | Mechanism | Auto-activates? |
 |-------|-----------|----------------|
-| Claude Code | Plugin (hooks + skills) or standalone hooks | Yes — SessionStart hook injects rules |
 | Codex | Plugin in `plugins/caveman/` with `hooks.json` | Yes — SessionStart hook |
 | Gemini CLI | Extension with `GEMINI.md` context file | Yes — context file loads every session |
 | Cursor | `.cursor/rules/caveman.mdc` with `alwaysApply: true` | Yes — always-on rule |
@@ -172,7 +116,7 @@ For agents without hook systems, the minimal always-on snippet lives in README u
 
 The honest delta for any skill is **skill vs terse**, not skill vs baseline. Baseline comparison conflates the skill with generic terseness — that is cheating. The harness is designed to prevent this.
 
-`llm_run.py` calls `claude -p --system-prompt ...` per (prompt, arm), saves output to `evals/snapshots/results.json`. `measure.py` reads the snapshot offline with tiktoken (OpenAI BPE — approximates Claude's tokenizer, ratios are meaningful, absolute numbers are approximate).
+`llm_run.py` calls `cursor agent -p ...` per (prompt, arm), saves output to `evals/snapshots/results.json`. `measure.py` reads the snapshot offline with tiktoken (OpenAI BPE — tokenizer approximation, ratios are meaningful, absolute numbers are approximate).
 
 To add a skill: drop `skills/<name>/SKILL.md`. The harness auto-discovers it. To add a prompt: append a line to `evals/prompts/en.txt`.
 
@@ -182,7 +126,7 @@ Snapshots are committed to git. CI reads them without API calls. Only regenerate
 
 ## Benchmarks
 
-`benchmarks/` runs real prompts through the Claude API (not Claude Code CLI) and records raw token counts. Results are committed as JSON in `benchmarks/results/`. The benchmark table in README is generated from these results — update it when regenerating.
+`benchmarks/` runs real prompts through the LLM API (not Cursor agent CLI) and records raw token counts. Results are committed as JSON in `benchmarks/results/`. The benchmark table in README is generated from these results — update it when regenerating.
 
 To reproduce: `uv run python benchmarks/run.py` (needs `ANTHROPIC_API_KEY` in `.env.local`).
 

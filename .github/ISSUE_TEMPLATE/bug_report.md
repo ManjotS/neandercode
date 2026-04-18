@@ -18,7 +18,7 @@ Want:  [what caveman should say]
 ```
 
 **Platform**
-- [ ] Claude Code
+- [ ] Cursor
 - [ ] Codex
 - [ ] Other: ___
 

@@ -5,6 +5,6 @@ __pycache__/
 .env.local
 caveman-compress.md
 **/.DS_Store
-.claude/worktrees/
+.cursor/worktrees/
 evals/snapshots/*.html
 evals/snapshots/*.png

@@ -25,7 +25,7 @@
 
 ---
 
-A [Claude Code](https://docs.anthropic.com/en/docs/claude-code) skill/plugin and Codex plugin that makes agent talk like caveman — cutting **~75% of output tokens** while keeping full technical accuracy. Now with [文言文 mode](#文言文-wenyan-mode), [terse commits](#caveman-commit), [one-line code reviews](#caveman-review), and a [compression tool](#caveman-compress) that cuts **~46% of input tokens** every session.
+A [Cursor](https://cursor.com) rule/skills/commands set that makes the agent talk like caveman — cutting **~75% of output tokens** while keeping full technical accuracy. Now with [文言文 mode](#文言文-wenyan-mode), [terse commits](#caveman-commit), [one-line code reviews](#caveman-review), and a [compression tool](#caveman-compress) that cuts **~46% of input tokens** every session.
 
 Based on the viral observation that caveman-speak dramatically reduces LLM token usage without losing technical substance. So we made it a one-line install.
 
@@ -35,14 +35,14 @@ Based on the viral observation that caveman-speak dramatically reduces LLM token
 <tr>
 <td width="50%">
 
-### 🗣️ Normal Claude (69 tokens)
+### 🗣️ Normal Agent (69 tokens)
 
 > "The reason your React component is re-rendering is likely because you're creating a new object reference on each render cycle. When you pass an inline object as a prop, React's shallow comparison sees it as a different object every time, which triggers a re-render. I'd recommend using useMemo to memoize the object."
 
 </td>
 <td width="50%">
 
-### 🪨 Caveman Claude (19 tokens)
+### 🪨 Caveman Agent (19 tokens)
 
 > "New object ref each render. Inline object prop = new ref = re-render. Wrap in `useMemo`."
 
@@ -51,14 +51,14 @@ Based on the viral observation that caveman-speak dramatically reduces LLM token
 <tr>
 <td>
 
-### 🗣️ Normal Claude
+### 🗣️ Normal Agent
 
 > "Sure! I'd be happy to help you with that. The issue you're experiencing is most likely caused by your authentication middleware not properly validating the token expiry. Let me take a look and suggest a fix."
 
 </td>
 <td>
 
-### 🪨 Caveman Claude
+### 🪨 Caveman Agent
 
 > "Bug in auth middleware. Token expiry check use `<` not `<=`. Fix:"
 
@@ -126,10 +126,9 @@ Pick your agent. One command. Done.
 
 | Agent | Install |
 |-------|---------|
-| **Claude Code** | `claude plugin marketplace add JuliusBrussee/caveman && claude plugin install caveman@caveman` |
 | **Codex** | Clone repo → `/plugins` → Search "Caveman" → Install |
 | **Gemini CLI** | `gemini extensions install https://github.com/JuliusBrussee/caveman` |
-| **Cursor** | `npx skills add JuliusBrussee/caveman -a cursor` |
+| **Cursor** | Open this repo in Cursor (native `.cursor/rules`, `.cursor/skills`, `.cursor/commands` included) |
 | **Windsurf** | `npx skills add JuliusBrussee/caveman -a windsurf` |
 | **Copilot** | `npx skills add JuliusBrussee/caveman -a github-copilot` |
 | **Cline** | `npx skills add JuliusBrussee/caveman -a cline` |
@@ -139,58 +138,25 @@ Install once. Use in every session for that install target after that. One rock.
 
 ### What You Get
 
-Auto-activation is built in for Claude Code, Gemini CLI, and the repo-local Codex setup below. `npx skills add` installs the skill for other agents, but does **not** install repo rule/instruction files, so Caveman does not auto-start there unless you add the always-on snippet below.
+Auto-activation is built in for Cursor when opened in this repo (via `.cursor/rules/caveman.mdc`), Gemini CLI, and this repo-local Codex setup. `npx skills add` still installs only the skill for most other agents.
 
-| Feature | Claude Code | Codex | Gemini CLI | Cursor | Windsurf | Cline | Copilot |
-|---------|:-----------:|:-----:|:----------:|:------:|:--------:|:-----:|:-------:|
-| Caveman mode | Y | Y | Y | Y | Y | Y | Y |
-| Auto-activate every session | Y | Y¹ | Y | —² | —² | —² | —² |
-| `/caveman` command | Y | Y¹ | Y | — | — | — | — |
-| Mode switching (lite/full/ultra) | Y | Y¹ | Y | Y³ | Y³ | — | — |
-| Statusline badge | Y⁴ | — | — | — | — | — | — |
-| caveman-commit | Y | — | Y | Y | Y | Y | Y |
-| caveman-review | Y | — | Y | Y | Y | Y | Y |
-| caveman-compress | Y | Y | Y | Y | Y | Y | Y |
-| caveman-help | Y | — | Y | Y | Y | Y | Y |
+| Feature | Cursor | Codex | Gemini CLI | Windsurf | Cline | Copilot |
+|---------|:------:|:-----:|:----------:|:--------:|:-----:|:-------:|
+| Caveman mode | Y | Y | Y | Y | Y | Y |
+| Auto-activate every session | Y | Y¹ | Y | —² | —² | —² |
+| `/caveman` command | Y | Y¹ | Y | — | — | — |
+| Mode switching (lite/full/ultra) | Y³ | Y¹ | Y | Y³ | — | — |
+| caveman-commit | Y | — | Y | Y | Y | Y |
+| caveman-review | Y | — | Y | Y | Y | Y |
+| caveman-compress | Y | Y | Y | Y | Y | Y |
+| caveman-help | Y | — | Y | Y | Y | Y |
 
 > [!NOTE]
-> Auto-activation works differently per agent: Claude Code uses SessionStart hooks, this repo's Codex dogfood setup uses `.codex/hooks.json`, Gemini uses context files. Cursor/Windsurf/Cline/Copilot can be made always-on, but `npx skills add` installs only the skill, not the repo rule/instruction files.
+> Auto-activation works differently per agent: Cursor in this repo uses `.cursor/rules/caveman.mdc`, this repo's Codex dogfood setup uses `.codex/hooks.json`, and Gemini uses context files. `npx skills add` installs only skills (not repo rule/instruction files) for most other agents.
 >
 > ¹ Codex uses `$caveman` syntax, not `/caveman`. This repo ships `.codex/hooks.json`, so caveman auto-starts when you run Codex inside this repo. The installed plugin itself gives you `$caveman`; copy the same hook into another repo if you want always-on behavior there too. caveman-commit and caveman-review are not in the Codex plugin bundle — use the SKILL.md files directly.
 > ² Add the "Want it always on?" snippet below to those agents' system prompt or rule file if you want session-start activation.
-> ³ Cursor and Windsurf receive the full SKILL.md with all intensity levels. Mode switching works on-demand via the skill; no slash command.
-> ⁴ Available in Claude Code, but plugin install only nudges setup. Standalone `install.sh` / `install.ps1` configures it automatically when no custom `statusLine` exists.
-
-<details>
-<summary><strong>Claude Code — full details</strong></summary>
-
-The plugin install gives you skills + auto-loading hooks. If no custom `statusLine` is configured, Caveman nudges Claude to offer badge setup on first session.
-
-```bash
-claude plugin marketplace add JuliusBrussee/caveman
-claude plugin install caveman@caveman
-```
-
-**Standalone hooks (without plugin):** If you prefer not to use the plugin system:
-```bash
-# macOS / Linux / WSL
-bash <(curl -s https://raw.githubusercontent.com/JuliusBrussee/caveman/main/hooks/install.sh)
-
-# Windows (PowerShell)
-irm https://raw.githubusercontent.com/JuliusBrussee/caveman/main/hooks/install.ps1 | iex
-```
-
-Or from a local clone: `bash hooks/install.sh` / `powershell -File hooks\install.ps1`
-
-Uninstall: `bash hooks/uninstall.sh` or `powershell -File hooks\uninstall.ps1`
-
-**Statusline badge:** Shows `[CAVEMAN]`, `[CAVEMAN:ULTRA]`, etc. in your Claude Code status bar.
-
-- **Plugin install:** If you do not already have a custom `statusLine`, Claude should offer to configure it on first session
-- **Standalone install:** Configured automatically by `install.sh` / `install.ps1` unless you already have a custom statusline
-- **Custom statusline:** Installer leaves your existing statusline alone. See [`hooks/README.md`](hooks/README.md) for the merge snippet
-
-</details>
+> ³ Cursor ships native commands in `.cursor/commands/` (`/caveman`, `/caveman-ultra`, `/caveman-commit`, etc).
 
 <details>
 <summary><strong>Codex — full details</strong></summary>
@@ -232,11 +198,11 @@ Auto-activates via `GEMINI.md` context file. Also ships custom Gemini commands:
 <details>
 <summary><strong>Cursor / Windsurf / Cline / Copilot — full details</strong></summary>
 
-`npx skills add` installs the skill file only — it does **not** install the agent's rule/instruction file, so caveman does not auto-start. For always-on, add the "Want it always on?" snippet below to your agent's rules or system prompt.
+For Cursor in this repo, caveman is already native: rule + skills + slash commands are checked in under `.cursor/`. For other agents installed via `npx skills add`, only skill files are installed (not always-on rule/instruction files).
 
 | Agent | Command | Not installed | Mode switching | Always-on location |
 |-------|---------|--------------|:--------------:|--------------------|
-| Cursor | `npx skills add JuliusBrussee/caveman -a cursor` | `.cursor/rules/caveman.mdc` | Y | Cursor rules |
+| Cursor | Open this repo in Cursor | — (already included in repo) | Y | `.cursor/rules`, `.cursor/skills`, `.cursor/commands` |
 | Windsurf | `npx skills add JuliusBrussee/caveman -a windsurf` | `.windsurf/rules/caveman.md` | Y | Windsurf rules |
 | Cline | `npx skills add JuliusBrussee/caveman -a cline` | `.clinerules/caveman.md` | — | Cline rules or system prompt |
 | Copilot | `npx skills add JuliusBrussee/caveman -a github-copilot` | `.github/copilot-instructions.md` + `AGENTS.md` | — | Copilot custom instructions |
@@ -335,24 +301,24 @@ Level stick until you change it or session end.
 
 ### caveman-compress
 
-`/caveman:compress <filepath>` — caveman make Claude *speak* with fewer tokens. **Compress** make Claude *read* fewer tokens.
+`/caveman:compress <filepath>` — caveman make Cursor *speak* with fewer tokens. **Compress** make Cursor *read* fewer tokens.
 
-Your `CLAUDE.md` loads on **every session start**. Caveman Compress rewrites memory files into caveman-speak so Claude reads less — without you losing the human-readable original.
-
-```
-/caveman:compress CLAUDE.md
-```
+Your `CURSOR.md` (or `.cursorrules`) loads on **every session start**. Caveman Compress rewrites memory files into caveman-speak so Cursor reads less — without you losing the human-readable original.
 
 ```
-CLAUDE.md          ← compressed (Claude reads this every session — fewer tokens)
+/caveman:compress CURSOR.md
+```
+
+```
+CURSOR.md          ← compressed (Cursor reads this every session — fewer tokens)
 CLAUDE.original.md ← human-readable backup (you read and edit this)
 ```
 
 | File | Original | Compressed | Saved |
 |------|----------:|----------:|------:|
-| `claude-md-preferences.md` | 706 | 285 | **59.6%** |
+| `cursor-md-preferences.md` | 706 | 285 | **59.6%** |
 | `project-notes.md` | 1145 | 535 | **53.3%** |
-| `claude-md-project.md` | 1122 | 636 | **43.3%** |
+| `cursor-md-project.md` | 1122 | 636 | **43.3%** |
 | `todo-list.md` | 627 | 388 | **38.1%** |
 | `mixed-with-code.md` | 888 | 560 | **36.9%** |
 | **Average** | **898** | **481** | **46%** |
@@ -361,7 +327,7 @@ Code blocks, URLs, file paths, commands, headings, dates, version numbers — an
 
 ## Benchmarks
 
-Real token counts from the Claude API ([reproduce it yourself](benchmarks/)):
+Real token counts from the LLM API ([reproduce it yourself](benchmarks/)):
 
 <!-- BENCHMARK-TABLE-START -->
 | Task | Normal (tokens) | Caveman (tokens) | Saved |
@@ -390,10 +356,10 @@ A March 2026 paper ["Brevity Constraints Reverse Performance Hierarchies in Lang
 
 Caveman not just claim 75%. Caveman **prove** it.
 
-The `evals/` directory has a three-arm eval harness that measures real token compression against a proper control — not just "verbose vs skill" but "terse vs skill". Because comparing caveman to verbose Claude conflate the skill with generic terseness. That cheating. Caveman not cheat.
+The `evals/` directory has a three-arm eval harness that measures real token compression against a proper control — not just "verbose vs skill" but "terse vs skill". Because comparing caveman to verbose agent conflate the skill with generic terseness. That cheating. Caveman not cheat.
 
 ```bash
-# Run the eval (needs claude CLI)
+# Run the eval (needs cursor CLI)
 uv run python evals/llm_run.py
 
 # Read results (no API key, runs offline)
@@ -408,7 +374,7 @@ If caveman save you mass token, mass money — leave mass star. ⭐
 
 ## Also by Julius Brussee
 
-- **[Cavekit](https://github.com/JuliusBrussee/cavekit)** — specification-driven development for Claude Code. Caveman language → specs → parallel builds → working software.
+- **[Cavekit](https://github.com/JuliusBrussee/cavekit)** — specification-driven development. Caveman language → specs → parallel builds → working software.
 - **[Revu](https://github.com/JuliusBrussee/revu-swift)** — local-first macOS study app with FSRS spaced repetition, decks, exams, and study guides. [revu.cards](https://revu.cards)
 
 ## License

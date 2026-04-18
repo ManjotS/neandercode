@@ -90,7 +90,7 @@ def main() -> None:
 
     fig.update_layout(
         title=dict(
-            text=f"<b>How much shorter does each skill make Claude's answers?</b><br>"
+            text=f"<b>How much shorter does each skill make Cursor's answers?</b><br>"
             f"<sub>Distribution of per-prompt savings vs system prompt = "
             f"<i>'Answer concisely.'</i><br>"
             f"{meta.get('model', '?')} · n={meta.get('n_prompts', '?')} prompts · "

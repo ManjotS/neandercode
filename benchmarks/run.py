@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Benchmark caveman vs normal Claude output token counts."""
+"""Benchmark caveman vs normal Agent output token counts."""
 
 import argparse
 import hashlib
@@ -237,11 +237,11 @@ def dry_run(prompts, model, trials):
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Benchmark caveman vs normal Claude")
+    parser = argparse.ArgumentParser(description="Benchmark caveman vs normal Agent")
     parser.add_argument("--trials", type=int, default=3, help="Trials per prompt per mode (default: 3)")
     parser.add_argument("--dry-run", action="store_true", help="Print config, no API calls")
     parser.add_argument("--update-readme", action="store_true", help="Update README.md benchmark table")
-    parser.add_argument("--model", default="claude-sonnet-4-20250514", help="Model to use")
+    parser.add_argument("--model", default="gpt-5", help="Model to use")
     args = parser.parse_args()
 
     prompts = load_prompts()

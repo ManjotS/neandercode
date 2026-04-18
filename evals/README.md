@@ -1,7 +1,7 @@
 # Evals
 
 Measures real token compression of caveman skills by running the same
-prompts through Claude Code under three conditions and comparing the
+prompts through Cursor Agent under three conditions and comparing the
 generated output token counts.
 
 ## The three arms
@@ -21,7 +21,7 @@ this harness did and is why its numbers were inflated.
 ## Why this design
 
 - **Real LLM output**, not hand-written examples (no circularity).
-- **Same Claude Code** the skills target — no separate API key.
+- **Same Cursor Agent CLI** used in day-to-day local automation.
 - **Snapshot committed to git** so CI runs are deterministic and free,
   and so any change to the numbers is reviewable as a diff.
 - **Control arm** isolates the skill's contribution from the generic
@@ -30,7 +30,7 @@ this harness did and is why its numbers were inflated.
 ## Files
 
 - `prompts/en.txt` — fixed list of dev questions, one per line.
-- `llm_run.py` — runs `claude -p --system-prompt …` per (prompt, arm),
+- `llm_run.py` — runs `cursor agent -p …` per (prompt, arm),
   captures real LLM output, writes `snapshots/results.json` along with
   metadata (model, CLI version, generation timestamp).
 - `measure.py` — reads the snapshot, counts tokens with tiktoken
@@ -39,17 +39,17 @@ this harness did and is why its numbers were inflated.
 - `snapshots/results.json` — committed source of truth, regenerated only
   when SKILL.md files or prompts change.
 
-## Refresh the snapshot (requires `claude` CLI logged in)
+## Refresh the snapshot (requires `cursor` CLI logged in)
 
 ```bash
 uv run python evals/llm_run.py
 ```
 
-This calls Claude once per prompt × (N skills + 2 control arms). Use
+This calls Cursor once per prompt × (N skills + 2 control arms). Use
 a small model to keep it cheap:
 
 ```bash
-CAVEMAN_EVAL_MODEL=claude-haiku-4-5 uv run python evals/llm_run.py
+CAVEMAN_EVAL_MODEL=gpt-5 uv run python evals/llm_run.py
 ```
 
 ## Read the snapshot (no LLM, no API key, runs in CI)
@@ -76,8 +76,8 @@ picks up every skill directory automatically.
   on every call, so output savings are not the full economic picture.
 - **Cross-model behavior** — only the model used to generate the
   snapshot is measured.
-- **Exact Claude tokens** — `tiktoken o200k_base` is OpenAI's BPE and is
-  only an approximation of Claude's tokenizer. Ratios between arms are
+- **Exact model tokens** — `tiktoken o200k_base` is OpenAI's BPE and is
+  only an approximation for many model tokenizers. Ratios between arms are
   meaningful; absolute numbers are approximate.
 - **Statistical significance** — single run per (prompt, arm) at default
   temperature. The min/max/stdev columns let you eyeball whether a

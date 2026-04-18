@@ -1,5 +1,5 @@
 """
-Run each prompt through Claude Code in three conditions and snapshot the
+Run each prompt through Cursor Agent in three conditions and snapshot the
 real LLM outputs:
 
   1. baseline      — no extra system prompt at all
@@ -16,12 +16,12 @@ evals/snapshots/results.json. Run it locally when SKILL.md files change.
 The CI-side `measure.py` only reads the snapshot and counts tokens.
 
 Requires:
-  - `claude` CLI on PATH (Claude Code), authenticated
+  - `cursor` CLI on PATH, authenticated (`cursor agent login`)
 
 Run: uv run python evals/llm_run.py
 
 Environment:
-  CAVEMAN_EVAL_MODEL  optional --model flag value passed through to claude
+  CAVEMAN_EVAL_MODEL  optional --model flag value passed through to cursor
 """
 
 from __future__ import annotations
@@ -40,21 +40,20 @@ SNAPSHOT = EVALS / "snapshots" / "results.json"
 TERSE_PREFIX = "Answer concisely."
 
 
-def run_claude(prompt: str, system: str | None = None) -> str:
-    cmd = ["claude", "-p"]
-    if system:
-        cmd += ["--system-prompt", system]
+def run_cursor(prompt: str, system: str | None = None) -> str:
+    cmd = ["cursor", "agent", "-p", "--output-format", "text", "--trust"]
     if model := os.environ.get("CAVEMAN_EVAL_MODEL"):
         cmd += ["--model", model]
-    cmd.append(prompt)
+    full_prompt = prompt if not system else f"{system}\n\nUser prompt:\n{prompt}"
+    cmd.append(full_prompt)
     out = subprocess.run(cmd, capture_output=True, text=True, check=True)
     return out.stdout.strip()
 
 
-def claude_version() -> str:
+def cursor_agent_version() -> str:
     try:
         out = subprocess.run(
-            ["claude", "--version"], capture_output=True, text=True, check=True
+            ["cursor", "agent", "--version"], capture_output=True, text=True, check=True
         )
         return out.stdout.strip()
     except Exception:
@@ -73,7 +72,7 @@ def main() -> None:
     snapshot: dict = {
         "metadata": {
             "generated_at": dt.datetime.now(dt.timezone.utc).isoformat(),
-            "claude_cli_version": claude_version(),
+            "cursor_agent_version": cursor_agent_version(),
             "model": os.environ.get("CAVEMAN_EVAL_MODEL", "default"),
             "n_prompts": len(prompts),
             "terse_prefix": TERSE_PREFIX,
@@ -83,18 +82,18 @@ def main() -> None:
     }
 
     print("baseline (no system prompt)", flush=True)
-    snapshot["arms"]["__baseline__"] = [run_claude(p) for p in prompts]
+    snapshot["arms"]["__baseline__"] = [run_cursor(p) for p in prompts]
 
     print("terse (control: terse instruction only, no skill)", flush=True)
     snapshot["arms"]["__terse__"] = [
-        run_claude(p, system=TERSE_PREFIX) for p in prompts
+        run_cursor(p, system=TERSE_PREFIX) for p in prompts
     ]
 
     for skill in skills:
         skill_md = (SKILLS / skill / "SKILL.md").read_text()
         system = f"{TERSE_PREFIX}\n\n{skill_md}"
         print(f"  {skill}", flush=True)
-        snapshot["arms"][skill] = [run_claude(p, system=system) for p in prompts]
+        snapshot["arms"][skill] = [run_cursor(p, system=system) for p in prompts]
 
     SNAPSHOT.parent.mkdir(parents=True, exist_ok=True)
     SNAPSHOT.write_text(json.dumps(snapshot, ensure_ascii=False, indent=2))

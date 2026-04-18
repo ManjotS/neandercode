@@ -73,14 +73,33 @@ def _count_tokens(text: str) -> int:
     return len(_encoding().encode(text))
 
 
+def _subprocess_env_for_cursor_agent() -> dict[str, str]:
+    """Unset CURSOR_CLI/CURSOR_AGENT so headless `cursor agent` matches an external terminal."""
+    env = os.environ.copy()
+    env.pop("CURSOR_CLI", None)
+    env.pop("CURSOR_AGENT", None)
+    return env
+
+
 def call_cursor_agent(model: str, system: str, prompt: str) -> dict:
     """Run `cursor agent -p` with combined system + user prompt; count output tokens locally."""
     full_prompt = f"{system}\n\nUser prompt:\n{prompt}"
-    cmd = ["cursor", "agent", "-p", "--output-format", "text", "--trust"]
+    cmd = [
+        "cursor",
+        "agent",
+        "-p",
+        "--output-format",
+        "text",
+        "--trust",
+        "--workspace",
+        str(REPO_DIR.resolve()),
+    ]
     if model:
         cmd += ["--model", model]
     cmd.append(full_prompt)
-    proc = subprocess.run(cmd, capture_output=True, text=True)
+    proc = subprocess.run(
+        cmd, capture_output=True, text=True, env=_subprocess_env_for_cursor_agent()
+    )
     if proc.returncode != 0:
         err = (proc.stderr or "") + (proc.stdout or "")
         low = err.lower()
@@ -90,7 +109,10 @@ def call_cursor_agent(model: str, system: str, prompt: str) -> dict:
             or "cursor agent login" in low
             or "CURSOR_API_KEY" in err
         ):
-            hint = " Authenticate: `cursor agent login` or set `CURSOR_API_KEY`."
+            hint = (
+                " Authenticate: `cursor agent login` or `CURSOR_API_KEY`. "
+                "(Clears CURSOR_CLI/CURSOR_AGENT for subprocess.)"
+            )
         elif "Cannot find module" in err or "file-service" in err:
             hint = (
                 " Try `cursor agent update` or reinstall Cursor; use ARM Cursor on Apple Silicon, x64 on Intel."

@@ -33,6 +33,7 @@ import subprocess
 from pathlib import Path
 
 EVALS = Path(__file__).parent
+REPO_ROOT = EVALS.parent.resolve()
 SKILLS = EVALS.parent / "skills"
 PROMPTS = EVALS / "prompts" / "en.txt"
 SNAPSHOT = EVALS / "snapshots" / "results.json"
@@ -40,13 +41,32 @@ SNAPSHOT = EVALS / "snapshots" / "results.json"
 TERSE_PREFIX = "Answer concisely."
 
 
+def _subprocess_env_for_cursor_agent() -> dict[str, str]:
+    """Unset CURSOR_CLI/CURSOR_AGENT so headless `cursor agent` matches an external terminal."""
+    env = os.environ.copy()
+    env.pop("CURSOR_CLI", None)
+    env.pop("CURSOR_AGENT", None)
+    return env
+
+
 def run_cursor(prompt: str, system: str | None = None) -> str:
-    cmd = ["cursor", "agent", "-p", "--output-format", "text", "--trust"]
+    cmd = [
+        "cursor",
+        "agent",
+        "-p",
+        "--output-format",
+        "text",
+        "--trust",
+        "--workspace",
+        str(REPO_ROOT),
+    ]
     if model := os.environ.get("NEANDERCODE_EVAL_MODEL"):
         cmd += ["--model", model]
     full_prompt = prompt if not system else f"{system}\n\nUser prompt:\n{prompt}"
     cmd.append(full_prompt)
-    proc = subprocess.run(cmd, capture_output=True, text=True)
+    proc = subprocess.run(
+        cmd, capture_output=True, text=True, env=_subprocess_env_for_cursor_agent()
+    )
     if proc.returncode != 0:
         err = (proc.stderr or "") + (proc.stdout or "")
         low = err.lower()
@@ -57,7 +77,8 @@ def run_cursor(prompt: str, system: str | None = None) -> str:
             or "CURSOR_API_KEY" in err
         ):
             hint = (
-                "\n\nAuthenticate: run `cursor agent login`, or set `CURSOR_API_KEY` for non-interactive use."
+                "\n\nAuthenticate: run `cursor agent login`, or set `CURSOR_API_KEY`. "
+                "(IDE chat is separate; this harness clears CURSOR_CLI/CURSOR_AGENT for the subprocess.)"
             )
         elif "Cannot find module" in err or "file-service" in err:
             hint = (
@@ -71,7 +92,11 @@ def run_cursor(prompt: str, system: str | None = None) -> str:
 def cursor_agent_version() -> str:
     try:
         out = subprocess.run(
-            ["cursor", "agent", "--version"], capture_output=True, text=True, check=True
+            ["cursor", "agent", "--version"],
+            capture_output=True,
+            text=True,
+            check=True,
+            env=_subprocess_env_for_cursor_agent(),
         )
         return out.stdout.strip()
     except Exception:

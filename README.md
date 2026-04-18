@@ -147,7 +147,9 @@ Repo scripts that call the model (`neandercode-compress`, `evals/llm_run.py`, `b
 1. **Interactive (usual)**: in a terminal, run once: **`cursor agent login`**
 2. **Scripts / CI / headless**: set **`CURSOR_API_KEY`** in the environment (Cursor documents how to obtain it)
 
-Chat in the IDE uses your logged-in Cursor session; **CLI tools are separate** until you log in the agent or set the key.
+Chat in the IDE uses your logged-in Cursor session; **`cursor agent -p` is a separate headless CLI** — it uses credentials from **`cursor agent login`** or **`CURSOR_API_KEY`**, not the chat pane.
+
+**Cursor’s integrated terminal** exports **`CURSOR_CLI`** (and sometimes **`CURSOR_AGENT`**). Those make the `cursor` shim delegate into the editor and can break headless **`cursor agent -p`** (including spurious auth errors). Repo scripts (`neandercode-compress`, `evals/llm_run.py`, `benchmarks/run.py`) **unset those variables in the subprocess**, pass **`--workspace`** to the repo root, and invoke the real CLI — same shape as running from iTerm or Terminal.
 
 If the agent errors with a missing `@anysphere/...` native module, run **`cursor agent update`** (see below).
 
@@ -161,7 +163,7 @@ If compress or evals fail with **`Cannot find module '@anysphere/file-service-da
 
 ### Troubleshooting: `Authentication required` (CLI)
 
-If you see **`Authentication required`** / **`cursor agent login`** when running compress or evals, the headless agent is not logged in. Run **`cursor agent login`** in a terminal, or export **`CURSOR_API_KEY`** for non-interactive runs.
+If you still see **`Authentication required`** after the subprocess clears **`CURSOR_CLI`** / **`CURSOR_AGENT`**, the CLI agent was never authenticated on this machine: run **`cursor agent login`** once, or set **`CURSOR_API_KEY`** for non-interactive runs.
 
 ## Usage
 

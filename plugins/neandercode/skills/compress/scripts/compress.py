@@ -72,6 +72,33 @@ MAX_RETRIES = 2
 # ---------- Cursor agent (only path; no vendor HTTP APIs) ----------
 
 
+def _subprocess_env_for_cursor_agent() -> dict[str, str]:
+    """Env for spawning `cursor agent` children.
+
+    Cursor's integrated terminal sets CURSOR_CLI (and sometimes CURSOR_AGENT) so the
+    `cursor` shim delegates into the editor. That breaks headless `cursor agent -p`
+    (including auth). Unset so the real CLI runs, like in an external terminal.
+    """
+    env = os.environ.copy()
+    env.pop("CURSOR_CLI", None)
+    env.pop("CURSOR_AGENT", None)
+    return env
+
+
+def _workspace_dir_for(anchor: Path | None) -> Path:
+    """Prefer git / .cursor root; else anchor's parent; else cwd."""
+    if anchor is None:
+        return Path.cwd().resolve()
+    resolved = anchor.resolve()
+    for parent in resolved.parents:
+        if (parent / ".git").exists():
+            return parent
+    for parent in resolved.parents:
+        if (parent / ".cursor").exists():
+            return parent
+    return resolved.parent
+
+
 def _cursor_agent_error_hint(stderr: str) -> str:
     """Extra help text for common cursor agent failures (auth, native modules)."""
     err = stderr or ""
@@ -82,8 +109,9 @@ def _cursor_agent_error_hint(stderr: str) -> str:
         or "CURSOR_API_KEY" in err
     ):
         return (
-            "\n\nAuthenticate CLI agent: run `cursor agent login` once in a terminal, "
-            "or set the `CURSOR_API_KEY` environment variable for non-interactive use (see Cursor docs)."
+            "\n\nAuthenticate the CLI agent (separate from IDE chat): run `cursor agent login` once, "
+            "or set `CURSOR_API_KEY` for non-interactive use. "
+            "This script clears CURSOR_CLI/CURSOR_AGENT in the subprocess so `cursor agent` matches an external terminal."
         )
     if "Cannot find module" in err or "file-service" in err:
         return (
@@ -95,8 +123,18 @@ def _cursor_agent_error_hint(stderr: str) -> str:
     return ""
 
 
-def call_llm(prompt: str) -> str:
-    cmd = ["cursor", "agent", "-p", "--output-format", "text", "--trust"]
+def call_llm(prompt: str, *, workspace_anchor: Path | None = None) -> str:
+    root = _workspace_dir_for(workspace_anchor)
+    cmd = [
+        "cursor",
+        "agent",
+        "-p",
+        "--output-format",
+        "text",
+        "--trust",
+        "--workspace",
+        str(root),
+    ]
     if model := os.environ.get("NEANDERCODE_MODEL"):
         cmd += ["--model", model]
     cmd.append(prompt)
@@ -106,6 +144,7 @@ def call_llm(prompt: str) -> str:
             text=True,
             capture_output=True,
             check=True,
+            env=_subprocess_env_for_cursor_agent(),
         )
         return strip_llm_wrapper(result.stdout.strip())
     except FileNotFoundError as e:
@@ -215,7 +254,7 @@ def compress_file(filepath: Path) -> bool:
     # Step 1: Compress
     print("Compressing with LLM...")
     try:
-        compressed = call_llm(build_compress_prompt(original_text))
+        compressed = call_llm(build_compress_prompt(original_text), workspace_anchor=filepath)
     except Exception:
         print(
             f"❌ Compression failed before writing compressed output. "
@@ -250,7 +289,8 @@ def compress_file(filepath: Path) -> bool:
 
         print("Applying targeted fixes with LLM...")
         compressed = call_llm(
-            build_fix_prompt(original_text, compressed, result.errors)
+            build_fix_prompt(original_text, compressed, result.errors),
+            workspace_anchor=filepath,
         )
         filepath.write_text(compressed)
 

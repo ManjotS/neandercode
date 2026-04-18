@@ -122,148 +122,30 @@ Based on the viral observation that caveman-speak dramatically reduces LLM token
 
 ## Install
 
-Pick your agent. One command. Done.
+Caveman is built natively for Cursor. It uses Cursor's `.cursor/rules`, `.cursor/skills`, and `.cursor/commands` to integrate seamlessly into your workflow.
 
-| Agent | Install |
-|-------|---------|
-| **Codex** | Clone repo → `/plugins` → Search "Caveman" → Install |
-| **Gemini CLI** | `gemini extensions install https://github.com/JuliusBrussee/caveman` |
-| **Cursor** | Open this repo in Cursor (native `.cursor/rules`, `.cursor/skills`, `.cursor/commands` included) |
-| **Windsurf** | `npx skills add JuliusBrussee/caveman -a windsurf` |
-| **Copilot** | `npx skills add JuliusBrussee/caveman -a github-copilot` |
-| **Cline** | `npx skills add JuliusBrussee/caveman -a cline` |
-| **Any other** | `npx skills add JuliusBrussee/caveman` |
-
-Install once. Use in every session for that install target after that. One rock. That it.
-
-### What You Get
-
-Auto-activation is built in for Cursor when opened in this repo (via `.cursor/rules/caveman.mdc`), Gemini CLI, and this repo-local Codex setup. `npx skills add` still installs only the skill for most other agents.
-
-| Feature | Cursor | Codex | Gemini CLI | Windsurf | Cline | Copilot |
-|---------|:------:|:-----:|:----------:|:--------:|:-----:|:-------:|
-| Caveman mode | Y | Y | Y | Y | Y | Y |
-| Auto-activate every session | Y | Y¹ | Y | —² | —² | —² |
-| `/caveman` command | Y | Y¹ | Y | — | — | — |
-| Mode switching (lite/full/ultra) | Y³ | Y¹ | Y | Y³ | — | — |
-| caveman-commit | Y | — | Y | Y | Y | Y |
-| caveman-review | Y | — | Y | Y | Y | Y |
-| caveman-compress | Y | Y | Y | Y | Y | Y |
-| caveman-help | Y | — | Y | Y | Y | Y |
-
-> [!NOTE]
-> Auto-activation works differently per agent: Cursor in this repo uses `.cursor/rules/caveman.mdc`, this repo's Codex dogfood setup uses `.codex/hooks.json`, and Gemini uses context files. `npx skills add` installs only skills (not repo rule/instruction files) for most other agents.
->
-> ¹ Codex uses `$caveman` syntax, not `/caveman`. This repo ships `.codex/hooks.json`, so caveman auto-starts when you run Codex inside this repo. The installed plugin itself gives you `$caveman`; copy the same hook into another repo if you want always-on behavior there too. caveman-commit and caveman-review are not in the Codex plugin bundle — use the SKILL.md files directly.
-> ² Add the "Want it always on?" snippet below to those agents' system prompt or rule file if you want session-start activation.
-> ³ Cursor ships native commands in `.cursor/commands/` (`/caveman`, `/caveman-ultra`, `/caveman-commit`, etc).
-
-<details>
-<summary><strong>Codex — full details</strong></summary>
-
-**macOS / Linux:**
-1. Clone repo → Open Codex in the repo directory → `/plugins` → Search "Caveman" → Install
-2. Repo-local auto-start is already wired by `.codex/hooks.json` + `.codex/config.toml`
-
-**Windows:**
-1. Enable symlinks first: `git config --global core.symlinks true` (requires Developer Mode or admin)
-2. Clone repo → Open VS Code → Codex Settings → Plugins → find "Caveman" under local marketplace → Install → Reload Window
-3. Codex hooks are currently disabled on Windows, so use `$caveman` to start manually
-
-This repo also ships `.codex/hooks.json` and enables hooks in `.codex/config.toml`, so caveman auto-activates while you run Codex inside this repo on macOS/Linux. The installed plugin gives you `$caveman`; if you want always-on behavior in other repos too, copy the same `SessionStart` hook there and enable:
-
-```toml
-[features]
-codex_hooks = true
-```
-
-</details>
-
-<details>
-<summary><strong>Gemini CLI — full details</strong></summary>
+**To install in your project:**
+Copy the `.cursor` directory from this repository into the root of your own project.
 
 ```bash
-gemini extensions install https://github.com/JuliusBrussee/caveman
+cp -r path/to/caveman/.cursor /path/to/your/project/
 ```
 
-Update: `gemini extensions update caveman` · Uninstall: `gemini extensions uninstall caveman`
-
-Auto-activates via `GEMINI.md` context file. Also ships custom Gemini commands:
-- `/caveman` — switch intensity level (lite/full/ultra/wenyan)
-- `/caveman-commit` — generate terse commit message
-- `/caveman-review` — one-line code review
-
-</details>
-
-<details>
-<summary><strong>Cursor / Windsurf / Cline / Copilot — full details</strong></summary>
-
-For Cursor in this repo, caveman is already native: rule + skills + slash commands are checked in under `.cursor/`. For other agents installed via `npx skills add`, only skill files are installed (not always-on rule/instruction files).
-
-| Agent | Command | Not installed | Mode switching | Always-on location |
-|-------|---------|--------------|:--------------:|--------------------|
-| Cursor | Open this repo in Cursor | — (already included in repo) | Y | `.cursor/rules`, `.cursor/skills`, `.cursor/commands` |
-| Windsurf | `npx skills add JuliusBrussee/caveman -a windsurf` | `.windsurf/rules/caveman.md` | Y | Windsurf rules |
-| Cline | `npx skills add JuliusBrussee/caveman -a cline` | `.clinerules/caveman.md` | — | Cline rules or system prompt |
-| Copilot | `npx skills add JuliusBrussee/caveman -a github-copilot` | `.github/copilot-instructions.md` + `AGENTS.md` | — | Copilot custom instructions |
-
-Uninstall: `npx skills remove caveman`
-
-Copilot works with Chat, Edits, and Coding Agent.
-
-</details>
-
-<details>
-<summary><strong>Any other agent (opencode, Roo, Amp, Goose, Kiro, and 40+ more)</strong></summary>
-
-[npx skills](https://github.com/vercel-labs/skills) supports 40+ agents:
-
+Alternatively, you can install just the base skill via `npx`:
 ```bash
-npx skills add JuliusBrussee/caveman           # auto-detect agent
-npx skills add JuliusBrussee/caveman -a amp
-npx skills add JuliusBrussee/caveman -a augment
-npx skills add JuliusBrussee/caveman -a goose
-npx skills add JuliusBrussee/caveman -a kiro-cli
-npx skills add JuliusBrussee/caveman -a roo
-# ... and many more
+npx skills add JuliusBrussee/caveman -a cursor
 ```
-
-Uninstall: `npx skills remove caveman`
-
-> **Windows note:** `npx skills` uses symlinks by default. If symlinks fail, add `--copy`: `npx skills add JuliusBrussee/caveman --copy`
-
-**Important:** These agents don't have a hook system, so caveman won't auto-start. Say `/caveman` or "talk like caveman" to activate each session.
-
-**Want it always on?** Paste this into your agent's system prompt or rules file — caveman will be active from the first message, every session:
-
-```
-Terse like caveman. Technical substance exact. Only fluff die.
-Drop: articles, filler (just/really/basically), pleasantries, hedging.
-Fragments OK. Short synonyms. Code unchanged.
-Pattern: [thing] [action] [reason]. [next step].
-ACTIVE EVERY RESPONSE. No revert after many turns. No filler drift.
-Code/commits/PRs: normal. Off: "stop caveman" / "normal mode".
-```
-
-Where to put it:
-| Agent | File |
-|-------|------|
-| opencode | `.config/opencode/AGENTS.md` |
-| Roo | `.roo/rules/caveman.md` |
-| Amp | your workspace system prompt |
-| Others | your agent's system prompt or rules file |
-
-</details>
+*(Note: `npx skills` only installs the skill file. For the full experience including slash commands and auto-activation rules, copying the `.cursor` folder is recommended.)*
 
 ## Usage
 
-Trigger with:
-- `/caveman` or Codex `$caveman`
-- "talk like caveman"
-- "caveman mode"
-- "less tokens please"
+Trigger caveman mode in Cursor Chat using the built-in slash commands:
+- `/caveman` — switch to default caveman mode
+- `/caveman-lite` — drop filler, keep grammar
+- `/caveman-ultra` — maximum compression
+- `/caveman-off` — disable caveman mode
 
-Stop with: "stop caveman" or "normal mode"
+Or just say "talk like caveman" or "less tokens please".
 
 ### Intensity Levels
 
@@ -301,17 +183,17 @@ Level stick until you change it or session end.
 
 ### caveman-compress
 
-`/caveman:compress <filepath>` — caveman make Cursor *speak* with fewer tokens. **Compress** make Cursor *read* fewer tokens.
+`/caveman-compress <filepath>` — caveman make Cursor *speak* with fewer tokens. **Compress** make Cursor *read* fewer tokens.
 
 Your `CURSOR.md` (or `.cursorrules`) loads on **every session start**. Caveman Compress rewrites memory files into caveman-speak so Cursor reads less — without you losing the human-readable original.
 
 ```
-/caveman:compress CURSOR.md
+/caveman-compress CURSOR.md
 ```
 
 ```
 CURSOR.md          ← compressed (Cursor reads this every session — fewer tokens)
-CLAUDE.original.md ← human-readable backup (you read and edit this)
+CURSOR.original.md ← human-readable backup (you read and edit this)
 ```
 
 | File | Original | Compressed | Saved |

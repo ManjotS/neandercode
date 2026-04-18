@@ -201,12 +201,23 @@ def compress_file(filepath: Path) -> bool:
         print("Aborting to prevent data loss. Please remove or rename the backup file if you want to proceed.")
         return False
 
+    # Safety backup BEFORE any LLM call (cursor agent / API can fail before first byte written).
+    backup_path.write_text(original_text)
+    print(f"Safety backup written: {backup_path}")
+
     # Step 1: Compress
     print("Compressing with LLM...")
-    compressed = call_llm(build_compress_prompt(original_text))
+    try:
+        compressed = call_llm(build_compress_prompt(original_text))
+    except Exception:
+        print(
+            f"❌ Compression failed before writing compressed output. "
+            f"Your unchanged original is still at {filepath}; full copy also at {backup_path}. "
+            f"To retry, delete or rename that backup file first."
+        )
+        raise
 
-    # Save original as backup, write compressed to original path
-    backup_path.write_text(original_text)
+    # Write compressed to original path (backup already holds pre-compression text)
     filepath.write_text(compressed)
 
     # Step 2: Validate + Retry

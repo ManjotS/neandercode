@@ -27,6 +27,7 @@ cd <directory_containing_this_SKILL.md> && python3 -m scripts <absolute_filepath
 
 3. The CLI will:
 - detect file type (no tokens)
+- write `<filename>.original.md` with the full original text **before** any LLM call (so Cursor/agent/API failures still leave a backup)
 - call LLM to compress (Anthropic API if key exists, else Cursor agent CLI)
 - validate output (no tokens)
 - if errors: cherry-pick fix with LLM (targeted fixes only, no recompression)

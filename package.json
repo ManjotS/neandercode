@@ -1,0 +1,24 @@
+{
+  "name": "neandercode",
+  "version": "1.0.0",
+  "description": "Caveman mode for Cursor - why use many token when few do trick",
+  "bin": {
+    "neandercode": "./install.js"
+  },
+  "files": [
+    ".cursor",
+    "install.js"
+  ],
+  "author": "",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ManjotS/neandercode.git"
+  },
+  "keywords": [
+    "cursor",
+    "ai",
+    "caveman",
+    "tokens"
+  ]
+}

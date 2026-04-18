@@ -131,11 +131,16 @@ Copy the `.cursor` directory from this repository into the root of your own proj
 cp -r path/to/caveman/.cursor /path/to/your/project/
 ```
 
-Alternatively, you can install just the base skill via `npx`:
+Alternatively, you can install the base skill via `npx`:
 ```bash
-npx skills add JuliusBrussee/caveman -a cursor
+npx skills add ManjotS/neandercode
 ```
-*(Note: `npx skills` only installs the skill file. For the full experience including slash commands and auto-activation rules, copying the `.cursor` folder is recommended.)*
+*(Note: `npx skills` only installs the skill file. For the full experience including slash commands and auto-activation rules, copying the `.cursor` folder or using `npx neandercode` is recommended.)*
+
+Or, you can install the full `.cursor` directory directly into your project using:
+```bash
+npx neandercode
+```
 
 ## Usage
 

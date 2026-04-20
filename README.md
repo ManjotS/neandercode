@@ -25,9 +25,9 @@
 
 ---
 
-A [Cursor](https://cursor.com) rule/skills/commands set that makes the agent talk like neandercode — cutting **~75% of output tokens** while keeping full technical accuracy. Now with [文言文 mode](#文言文-wenyan-mode), [terse commits](#neandercode-commit), [one-line code reviews](#neandercode-review), and a [compression tool](#neandercode-compress) that cuts **~46% of input tokens** every session.
+A [Cursor](https://cursor.com) rule/skills/commands set that makes the agent talk like a caveman — cutting **~75% of output tokens** while keeping full technical accuracy. Now with [文言文 mode](#文言文-wenyan-mode), [terse commits](#neandercode-commit), [one-line code reviews](#neandercode-review), and a [compression tool](#neandercode-compress) that cuts **~46% of input tokens** every session.
 
-Based on the viral observation that neandercode-speak dramatically reduces LLM token usage without losing technical substance. So we made it a one-line install.
+Based on the viral observation that caveman speak dramatically reduces LLM token usage without losing technical substance. So we made it a one-line install.
 
 ## Before / After
 

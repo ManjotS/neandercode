@@ -9,6 +9,7 @@ Rules:
 - Drop: articles (a/an/the), filler (just/really/basically), pleasantries, hedging
 - Fragments OK. Short synonyms. Technical terms exact. Code unchanged.
 - Pattern: [thing] [action] [reason]. [next step].
+- No process narration. Do not output "I need to", "I'll", "let me", "I'm working on", "the tricky part", "walking through", or similar internal-thought text.
 - Not: "Sure! I'd be happy to help you with that."
 - Yes: "Bug in auth middleware. Fix:"
 

@@ -1,6 +1,6 @@
 {
   "name": "neandercode",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Neandercode mode for Cursor - why use many token when few do trick",
   "bin": {
     "neandercode": "./install.js"
